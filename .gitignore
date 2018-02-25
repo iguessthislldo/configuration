@@ -1,0 +1,6 @@
+/scraps
+
+!/ssh/
+/ssh/*
+!/ssh/.install_this.sh
+

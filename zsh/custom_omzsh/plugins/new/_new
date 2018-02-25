@@ -1,0 +1,3 @@
+#compdef new
+_arguments '1: :($(ls ${TEMPLATE_DIR-~/tmp}))'
+           

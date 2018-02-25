@@ -1,0 +1,10 @@
+#!/bin/zsh
+
+# DIRECTORIES
+export DATA=/data
+export CONFIG=$DATA/configuration
+export XDG_CONFIG_HOME=~/.config
+
+# APPLICATIONS
+export EDITOR=nvim
+export GOPATH=$XDG_CONFIG_HOME/go
