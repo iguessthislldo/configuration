@@ -47,3 +47,7 @@ set whichwrap+=<,>,h,l
 " let &colorcolumn=join(range(81,999),",")
 " Tab is 4 Spaces
 set softtabstop=4 tabstop=4 shiftwidth=4 expandtab
+
+" C Syntax
+let c_gnu=1
+

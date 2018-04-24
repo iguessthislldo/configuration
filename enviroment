@@ -7,4 +7,7 @@ export XDG_CONFIG_HOME=~/.config
 
 # APPLICATIONS
 export EDITOR=nvim
+
+# GO
 export GOPATH=$XDG_CONFIG_HOME/go
+export PATH="/usr/lib/go-1.10/bin:$GOPATH/bin:$PATH"

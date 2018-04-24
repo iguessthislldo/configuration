@@ -3,8 +3,11 @@
 alias r="source ~/.zshenv;source ~/.zshrc"
 alias e=$EDITOR
 alias p="sudo pacman"
+alias apt="sudo apt"
+alias awk="gawk" # Always use gawk
 alias s="sudo systemctl"
 alias vim="nvim"
+alias ipy="ipython3"
 
 # Pager
 alias P="$EDITOR -R -"
