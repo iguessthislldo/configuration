@@ -1,21 +1,26 @@
 " -------------------- Plugins --------------------
 call plug#begin(g:vim_home. '/plugged')
 
+" Critical
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'benekastah/neomake'
-Plug 'scrooloose/nerdtree'
 Plug 'thinca/vim-localrc'
-Plug 'tpope/vim-fugitive' " Git
-Plug 'critiqjo/lldb.nvim'
+Plug 'scrooloose/nerdtree'
 
-"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-"Plug 'zchee/deoplete-jedi'
-" Plug 'zchee/deoplete-clang'
+" Git
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+" TODO: Trying out
+Plug 'tpope/vim-commentary'
 Plug 'rust-lang/rust.vim'
 
-" Trying out
-Plug 'tpope/vim-commentary'
+" TODO: Unused?/Fix?
+Plug 'benekastah/neomake'
+Plug 'critiqjo/lldb.nvim'
+"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+"Plug 'zchee/deoplete-jedi'
+"Plug 'zchee/deoplete-clang'
 
 call plug#end()
 
