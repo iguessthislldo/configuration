@@ -1,19 +1,13 @@
 " -------------------- Plugins --------------------
 call plug#begin(g:vim_home. '/plugged')
 
-" Critical
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'thinca/vim-localrc'
 Plug 'scrooloose/nerdtree'
-
-" Git
+Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
-
-" TODO: Trying out
-Plug 'tpope/vim-commentary'
-Plug 'rust-lang/rust.vim'
 
 " TODO: Unused?/Fix?
 Plug 'benekastah/neomake'
@@ -47,3 +41,4 @@ set noautoindent
 set t_Co=256
 let g:airline_powerline_fonts = 1
 let g:airline_theme="laederon"
+
