@@ -1,3 +1,6 @@
+" Tick Time
+set updatetime=100
+
 " Use Unix as the standard file type
 set ffs=unix,dos,mac
 
@@ -48,6 +51,23 @@ set whichwrap+=<,>,h,l
 " Tab is 4 Spaces
 set softtabstop=4 tabstop=4 shiftwidth=4 expandtab
 
+" ================ C/C++ ====================
+
 " C Syntax
 let c_gnu=1
+
+" Do not indent case statments
+set cinoptions=:0
+
+" Do not indent public, private, etc in classes
+set cinoptions+=g-1
+
+" ================ Key Combinations ====================
+
+" Set Leader
+let mapleader = ","
+
+" Copy Paste from system keyboard
+vnoremap <leader>y "+y
+nnoremap <leader>p "+p
 
