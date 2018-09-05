@@ -1,5 +1,6 @@
-function _testd {
-    mkdir /tmp/$1
-    cd /tmp/$1
+function testd {
+    guid="$(uuidgen)"
+    mkdir "/tmp/${guid}"
+    cd "/tmp/${guid}"
 }
-alias testd="_testd $(uuidgen)"
+
