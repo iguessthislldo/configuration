@@ -13,3 +13,6 @@ augroup tao_idl_ft
   au! BufNewFile,BufRead *.ll setf lex
 augroup END
 
+augroup ace_makefiles
+  au! BufNewFile,BufRead *.GNU setf make
+augroup END
