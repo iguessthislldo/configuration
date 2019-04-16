@@ -62,6 +62,9 @@ set cinoptions=:0
 " Do not indent public, private, etc in classes
 set cinoptions+=g-1
 
+" Highlight Trailing Space
+let c_space_errors = 1
+
 " ================ Key Combinations ====================
 
 " Set Leader
@@ -71,3 +74,4 @@ let mapleader = ","
 vnoremap <leader>y "+y
 nnoremap <leader>p "+p
 
+set background=dark

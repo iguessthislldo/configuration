@@ -49,7 +49,7 @@ ZSH_CUSTOM=$CONFIG/zsh/custom_omzsh
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(cake new tldr_complete docker pip sudo systemd zsh_reload)
+plugins=(cake new docker pip sudo systemd zsh_reload)
 
 # User configuration
 

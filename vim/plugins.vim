@@ -8,7 +8,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'mzlogin/vim-markdown-toc'
 
 " TODO: Unused?/Fix?
 Plug 'benekastah/neomake'
@@ -16,6 +16,7 @@ Plug 'critiqjo/lldb.nvim'
 "Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 "Plug 'zchee/deoplete-jedi'
 "Plug 'zchee/deoplete-clang'
+" Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 call plug#end()
 
@@ -43,3 +44,4 @@ set noautoindent
 let g:airline_powerline_fonts = 1
 let g:airline_theme="simple"
 
+let g:gitgutter_max_signs = 1000
