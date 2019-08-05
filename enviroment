@@ -10,7 +10,4 @@ export EDITOR=nvim
 
 # GO
 export GOPATH=$XDG_CONFIG_HOME/go
-export PATH="/usr/lib/go-1.10/bin:$GOPATH/bin:$PATH"
-
-# OTHER
-export DDS_BUILDS="$DATA/work/oci/dds"
+export PATH="$DATA/programs/standalone/zig:$PATH"

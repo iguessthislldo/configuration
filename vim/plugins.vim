@@ -9,14 +9,7 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'mzlogin/vim-markdown-toc'
-
-" TODO: Unused?/Fix?
-Plug 'benekastah/neomake'
-Plug 'critiqjo/lldb.nvim'
-"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-"Plug 'zchee/deoplete-jedi'
-"Plug 'zchee/deoplete-clang'
-" Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'ziglang/zig.vim.git'
 
 call plug#end()
 
