@@ -21,6 +21,14 @@ set numberwidth=2
 " Disable Mouse
 set mouse=
 
+" Update spl file if needed
+" from https://vi.stackexchange.com/a/5052
+for d in glob(g:vim_home . '/spell/*.add', 1, 1)
+    if filereadable(d) && (!filereadable(d . '.spl') || getftime(d) > getftime(d . '.spl'))
+        exec 'mkspell! ' . fnameescape(d)
+    endif
+endfor
+
 " ================ Search ====================
 
 " Highlight search results
