@@ -3,6 +3,7 @@
 alias r="source ~/.zshenv;source ~/.zshrc"
 alias e=$EDITOR
 alias p="sudo pacman"
+alias o="xdg-open"
 alias apt="sudo apt"
 alias awk="gawk" # Always use gawk
 alias s="sudo systemctl"
