@@ -1,4 +1,14 @@
 " -------------------- Plugins --------------------
+
+" Download vim-plug if it's not there
+" Based on https://github.com/junegunn/vim-plug/wiki/tips#automatic-installation
+let s:plug_path = g:vim_home . '/autoload/plug.vim'
+let s:plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+if empty(glob(s:plug_path))
+  silent execute '!curl -fLo ' . s:plug_path . ' --create-dirs ' . s:plug_url
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 call plug#begin(g:vim_home. '/plugged')
 
 Plug 'vim-airline/vim-airline'
