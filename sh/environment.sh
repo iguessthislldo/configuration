@@ -1,25 +1,20 @@
 export DATA=/data
 export CONFIG=$DATA/configuration
 
-for f in $(find $CONFIG/sh/environment.d -name '*.sh')
-do
-    source $f
-done
-
-if $IS_ZSH
+if [ -z ${ZSH_VERSION+x} ]
 then
-    for f in $(find $CONFIG/sh/environment.d -name '*.zsh')
-    do
-        source $f
-    done
+    export IS_ZSH=false
+else
+    export IS_ZSH=true
 fi
 
-if $IS_BASH
+if [ -z ${BASH_VERSION+x} ]
 then
-    for f in $(find $CONFIG/sh/environment.d -name '*.bash')
-    do
-        source $f
-    done
+    export IS_BASH=false
+else
+    export IS_BASH=true
 fi
 
-unset f
+source "$CONFIG/sh/igtd_sh_config_loader.sh"
+igtd_sh_config_loader "$CONFIG/sh/environment.d"
+unset -f igtd_sh_config_loader
