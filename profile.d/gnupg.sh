@@ -1,1 +1,0 @@
-GNUPGHOME="$CONFIG/gpg"

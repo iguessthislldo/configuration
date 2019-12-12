@@ -1,5 +1,3 @@
-#!/bin/zsh
-
 alias r="source ~/.zshenv;source ~/.zshrc"
 alias e=$EDITOR
 alias p="sudo pacman"
@@ -16,7 +14,6 @@ alias lP="l|P"
 alias llP="ll|P"
 
 # navigation
-
 function u {
     if [ $# -eq 1 ]; then
         local path=''
@@ -38,7 +35,3 @@ alias l="ls --color=always --classify --group-directories-first"
 alias cl="clear && l"
 alias la="l --almost-all"
 alias ll="la -l --si"
-
-# Python Virtual Enviroments
-alias venv='virtualenv -p /usr/bin/python3 .venv'
-alias activate='dir=$(pwd); while [[ ! -f .venv/bin/activate && "$(pwd)" != "/" ]]; do; cd ..; done; source .venv/bin/activate; cd $dir; unset dir'

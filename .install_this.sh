@@ -3,9 +3,8 @@
 Link cfg
 
 # zsh
-Link zsh/rc.zsh .zshrc
-Link enviroment .zshenv
-Link profile .zprofile
+Link sh/rc.sh .zshrc
+Link sh/environment.sh .zshenv
 
 # neovim
 Link vim .config/nvim
