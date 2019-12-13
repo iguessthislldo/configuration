@@ -1,2 +1,3 @@
-/environment.d/*.local.*
-/profile.d/*.local.*
+/config-for-*.sh
+*.local-for-*.*
+*.local.*
