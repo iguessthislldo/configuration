@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import re
+
+try:
+    editor = os.environ['EDITOR']
+except KeyError:
+    sys.exit('EDITOR is not set')
+
+sh_bool = {'true': True, 'false': False}
+try:
+    editor_is_vi = sh_bool[os.environ['IGTD_EDITOR_IS_VI']]
+except KeyError:
+    sys.exit('IGTD_EDITOR_IS_VI not set or not valid')
+
+regex = re.compile(r'(.*):(\d+)')
+args = [editor]
+if editor_is_vi:
+    for arg in sys.argv[1:]:
+        m = regex.match(arg)
+        if m:
+            args.append(m.group(1))
+            args.append('+' + m.group(2))
+        else:
+            args.append(arg)
+else:
+    args.extend(sys.argv[1:])
+
+os.execvp(editor, args)
