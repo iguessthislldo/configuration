@@ -1,18 +1,35 @@
 " GDB ------------------------------------------------------------------------
-" Set filetype if it has an gdb ext
-augroup gdb_ft
-  au! BufNewFile,BufRead *.gdb setf gdb
+
+augroup igtd_gdb_ft
+    autocmd!
+
+    " Set filetype if it has an gdb ext
+    autocmd BufNewFile,BufRead *.gdb setf gdb
+
+    " how to comment
+    autocmd FileType gdb setlocal commentstring=#\ %s
 augroup END
+
+" ACE/TAO --------------------------------------------------------------------
+
+augroup igtd_ace_tao_files
+    autocmd!
+
+    " *.ypp are yacc files
+    autocmd BufNewFile,BufRead *.ypp setf yacc
+
+    " *.ll are lex files
+    autocmd BufNewFile,BufRead *.ll setf lex
+
+    " *.GNU are make
+    autocmd BufNewFile,BufRead *.GNU setf make
+augroup END
+
+" CMake ----------------------------------------------------------------------
+
 " how to comment
-autocmd FileType gdb setlocal commentstring=#\ %s
+augroup igtd_gdb_ft
+    autocmd!
 
-" tao_idl flex/bison ---------------------------------------------------------
-" *.ypp are yacc files
-augroup tao_idl_ft
-  au! BufNewFile,BufRead *.ypp setf yacc
-  au! BufNewFile,BufRead *.ll setf lex
-augroup END
-
-augroup ace_makefiles
-  au! BufNewFile,BufRead *.GNU setf make
+    autocmd FileType cmake setlocal commentstring=#\ %s
 augroup END

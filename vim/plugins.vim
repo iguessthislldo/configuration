@@ -20,6 +20,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'ziglang/zig.vim.git'
+Plug 'nvie/vim-flake8'
 
 call plug#end()
 
