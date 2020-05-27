@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -e
+
+function list_ids {
+    git config --name-only --get-regexp 'user\.id\.\w+$' | cut -d . -f 3
+}
+
+function set_config {
+    id="$1"
+    key="$2"
+    value="$(git config user.id.$id.$key)"
+    echo "$key = $value"
+    git config "user.$key" "$value"
+}
+
+if [ -z "$1" ]
+then
+    echo "Needs Subcommand: 'use', 'list'"
+    exit 1
+fi
+
+if [ "$1" = "list" ]
+then
+    list_ids
+    exit 0
+
+elif [ "$1" = "use" ]
+then
+    id="$2"
+    if [ -z "$id" ]
+    then
+        echo "Needs Identity. Current Ones Are:"
+        list_ids
+        exit 1
+    fi
+
+    if ! list_ids | grep --silent -E "^$id$"
+    then
+        echo "$id is not a valid id. Valid ids are:"
+        list_ids
+        exit 1
+    fi
+
+    echo "Using $id"
+    set_config "$id" 'name'
+    set_config "$id" 'email'
+    set_config "$id" 'signingkey'
+fi
+

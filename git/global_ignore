@@ -1,3 +1,4 @@
 .local.vimrc
 .clangd
 compile_commands.json
+*.so
