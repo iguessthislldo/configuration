@@ -47,8 +47,9 @@ set smartcase
 " Makes search act like search in modern browsers
 set incsearch 
 
-hi Folded ctermbg=58
-"setlocal foldmethod=syntax
+" Folding
+setlocal foldmethod=syntax
+set nofoldenable
 
 " =============================================
 
