@@ -64,14 +64,44 @@ function prompt_git {
     fi
 }
 
+# Notify If These Variables Are Exported =====================================
+function igtd-var-notify {
+    local result
+    result=""
+    typeset -A var_notify
+    var_notify[DDS_ROOT]=D
+    var_notify[ACE_ROOT]=A
+    var_notify[TAO_ROOT]=T
+
+    local var
+    for var in $(env | cut -d '=' -f 1)
+    do
+        if [ -n ${var_notify[$var]+x} ]
+        then
+            result="$result${var_notify[$var]}"
+        fi
+    done
+
+    if [ -n "$result" ]
+    then
+        segment magenta $result
+    fi
+}
+
 # Tie it all together ========================================================
 function prompt_top {
     segment blue '%n @ %M'
+
     segment yellow "$(date +%T)"
+
     # Show Job Count if > 1
     echo -n "%(1j.$(segment cyan "$IGTD_JOBS %j").)"
+
     # Show Shell Level if > 2
     echo -n "%(2L.$(segment cyan "$IGTD_RECURSIVE_SHELL %L").)"
+
+    igtd-var-notify
+
     prompt_git
 }
 
