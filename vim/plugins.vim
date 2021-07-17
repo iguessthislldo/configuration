@@ -5,8 +5,8 @@
 let s:plug_path = g:vim_home . '/autoload/plug.vim'
 let s:plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 if empty(glob(s:plug_path))
-  silent execute '!curl -fLo ' . s:plug_path . ' --create-dirs ' . s:plug_url
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    silent execute '!curl -fLo ' . s:plug_path . ' --create-dirs ' . s:plug_url
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 call plug#begin(g:vim_home. '/plugged')
@@ -17,58 +17,51 @@ Plug 'thinca/vim-localrc'
 Plug 'scrooloose/nerdtree'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-obsession'
+Plug 'tpope/vim-unimpaired'
+Plug 'ap/vim-buftabline'
 Plug 'airblade/vim-gitgutter'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'ziglang/zig.vim'
 Plug 'nvie/vim-flake8'
-
 Plug 'autozimu/LanguageClient-neovim', {
     \ 'branch': 'next',
     \ 'do': 'bash install.sh',
     \ }
 Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+
+" Use local copy of vim-opendds, else download it
+if isdirectory(expand('$LOCAL_VIM_OPENDDS'))
+    Plug '~/oci/dds/vim-opendds'
+else
+    Plug 'iguessthislldo/vim-opendds'
+endif
 
 call plug#end()
 
 " -------------------- Plugins Settings --------------------
 
-set noautoindent
-
-" Use deoplete.
-"let g:deoplete#enable_at_startup = 1
-" Use smartcase.
-"let g:deoplete#enable_smart_case = 1
-
-" <C-h>, <BS>: close popup and delete backword char.
-"inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
-"inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
-
-" <CR>: close popup and save indent.
-"inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-"function! s:my_cr_function() abort
-"  return deoplete#close_popup() . "\<CR>"
-"endfunction
-
 " Airline
-"set t_Co=256
 let g:airline_powerline_fonts = 1
 let g:airline_theme="simple"
 
+" Gitgutter
 let g:gitgutter_max_signs = 1000
 
+" Zig
 let g:zig_fmt_autosave = 0
 
-set hidden
-
+" Language Client
 let g:LanguageClient_serverCommands = {
   \ 'cpp': ['clangd'],
   \ }
 function LC_maps()
-  if has_key(g:LanguageClient_serverCommands, &filetype)
-    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
-    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
-    nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-  endif
+    if has_key(g:LanguageClient_serverCommands, &filetype)
+        nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
+        nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
+        nnoremap <buffer> <silent> gi :call LanguageClient#textDocument_implementation()<CR>
+        nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    endif
 endfunction
-
 autocmd FileType * call LC_maps()

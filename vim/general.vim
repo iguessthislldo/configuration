@@ -7,9 +7,6 @@ set ffs=unix,dos,mac
 " Tags
 set tags=./tags;/
 
-" NO NOT AUTOINDENT UNLESS ENTER IS PRESSED
-autocmd BufReadPre,FileReadPre setlocal indentkeys=*<Return>
-
 " Undo
 set undofile
 set undodir=~/cfg/vim/undo_dir
@@ -29,9 +26,14 @@ for d in glob(g:vim_home . '/spell/*.add', 1, 1)
     endif
 endfor
 
-" F12 Resync Syntax Highlighting
-noremap <F12> <Esc>:syntax sync fromstart<CR>
-inoremap <F12> <C-o>:syntax sync fromstart<CR>
+set background=dark
+
+set noautoindent
+
+set hidden
+
+" Display Encoding Errors as Hex
+set display+=uhex
 
 " ================ Search ====================
 
@@ -87,4 +89,19 @@ let mapleader = ","
 vnoremap <leader>y "+y
 nnoremap <leader>p "+p
 
-set background=dark
+" NO NOT AUTOINDENT UNLESS ENTER IS PRESSED
+autocmd BufReadPre,FileReadPre setlocal indentkeys=*<Return>
+
+" F12 Resync Syntax Highlighting
+noremap <F12> <Esc>:syntax sync fromstart<CR>
+inoremap <F12> <C-o>:syntax sync fromstart<CR>
+
+" augroup jinga_syntax
+"     autocmd!
+"     autocmd Syntax * syntax region Comment start="{{" end="}}" skip="'}}'"
+"     autocmd Syntax * echo('any syntax called')
+" augroup END
+" autocmd Syntax * syntax region Comment start="{{" end="}}" skip="'}}'"
+" syntax region Comment start="{%" end="%}"
+" syntax region Comment start="{#" end="#}"
+" Copy Paste from system keyboard
