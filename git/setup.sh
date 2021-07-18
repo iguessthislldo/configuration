@@ -10,6 +10,7 @@ git config --global --unset user.signingkey
 
 git config --global commit.gpgsign true
 
+# TODO: the loader sees .install_this.sh
 source "$CONFIG/sh/igtd_sh_loader.sh"
 igtd_sh_loader "$CONFIG/git/identities.d"
 unset -f igtd_sh_loader
