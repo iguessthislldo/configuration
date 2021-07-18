@@ -1,4 +1,6 @@
 /scraps
+/export-list
+/export.txz
 
 !/ssh/
 /ssh/*

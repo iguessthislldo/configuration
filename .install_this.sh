@@ -1,12 +1,12 @@
 #!/bin/bash
 
-Link cfg
+InstallLink cfg
 
 # zsh
-Link sh/rc.sh .zshrc
-Link sh/environment.sh .zshenv
+InstallLink sh/rc.sh .zshrc
+InstallLink sh/environment.sh .zshenv
 
 # neovim
-Link vim .config/nvim
+InstallLink vim .config/nvim
 
 Scan
