@@ -23,7 +23,8 @@ My framework for my configuration/dot files.
    installed and running.
 8. `bash install_data.sh` one final time to have it take up the imported files.
 9. Set terminal font if desired.
-10. `cd ~/cfg/git ; bash setup.sh` to setup Git.
+10. Run `./sh/setup_gnome_term.sh` if using GNOME Terminal.
+11. `cd ~/cfg/git ; bash setup.sh` to setup Git.
 
 ## Directory Structure
 
