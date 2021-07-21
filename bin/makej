@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+nproc=`nproc`
+exec make -j$(($nproc+1)) "$@"
