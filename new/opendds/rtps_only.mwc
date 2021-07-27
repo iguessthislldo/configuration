@@ -1,0 +1,17 @@
+workspace {
+  dds
+  exclude {
+    dds/InfoRepo
+    dds/DCPS/transport/multicast
+    dds/DCPS/transport/udp
+    dds/DCPS/transport/shmem
+    dds/DCPS/transport/tcp
+    dds/DCPS/QOS_XML_Handler
+    dds/DCPS/InfoRepoDiscovery
+    dds/FACE
+    dds/CORBA/tao
+    dds/InfoRepo
+    dds/monitor
+    dds/CorbaSeq
+  }
+}
