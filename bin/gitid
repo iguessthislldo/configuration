@@ -34,6 +34,7 @@ then
         list_ids
         exit 1
     fi
+    cd "${3:-.}"
 
     if ! list_ids | grep --silent -E "^$id$"
     then
