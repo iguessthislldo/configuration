@@ -1,4 +1,5 @@
 {
     "build_tao": "true",
+    "oci_tao": "false",
     "new_post_command": ["bash", "clone_ace_tao.sh"]
 }
