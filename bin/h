@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+import sys
+import re
+import os
+from datetime import datetime, timedelta
+
+line_regex = re.compile(r': (\d+)(.+)')
+
+target = (datetime.now() - timedelta(days=int(sys.argv[1]))).date()
+
+with open(os.environ.get('HOME') + '/.zsh_history') as f:
+    for line in f:
+        m = line_regex.match(line)
+        if m:
+            t = datetime.fromtimestamp(int(m.group(1)))
+            if t.date() == target:
+                print(t, m.group(2))
