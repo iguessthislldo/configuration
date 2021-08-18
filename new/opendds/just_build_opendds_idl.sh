@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+
+source "%dest%/setenv.sh"
+
 cd "%dest%/OpenDDS"
-make -j 10 opendds_idl
-make -t -j 10
+makej opendds_idl
+makej -t

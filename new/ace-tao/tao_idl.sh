@@ -1,9 +1,7 @@
 #!/bin/bash
 set -e
-if [ -z ${ACE_ROOT+x} ]
-then
-  source "%dest%/setenv.sh"
-fi
+
+source "%dest%/setenv.sh"
 
 if [ ! -z ${D+x} ]
 then
