@@ -198,3 +198,6 @@ NONINFRINGEMENT
 Unescaped
 builtin
 backticks
+FQDN
+IDL4
+virtualenv
