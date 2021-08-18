@@ -1,6 +1,10 @@
 #!/bin/bash
-
 set -e
+
+# TODO:
+# - Make signing key optional?
+# - A way to add ids from the command?
+# - Autocomplete would be nice
 
 function list_ids {
     git config --name-only --get-regexp 'user\.id\.\w+$' | cut -d . -f 3
@@ -14,32 +18,36 @@ function set_config {
     git config "user.$key" "$value"
 }
 
-if [ -z "$1" ]
-then
-    echo "Needs Subcommand: 'use', 'list'"
-    exit 1
-fi
+function print_usage {
+    echo "usage:"
+    echo "  gitid -h | --help"
+    echo "    Prints this message."
+    echo "  gitid list"
+    echo "    Prints the id nicknames that can be used."
+    echo "  gitid use ID [DIR]"
+    echo "    Sets the git repo in the current repository to use ID. DIR is the optional"
+    echo "    repository to set instead of the in the current directory."
+}
 
 if [ "$1" = "list" ]
 then
     list_ids
-    exit 0
 
 elif [ "$1" = "use" ]
 then
     id="$2"
     if [ -z "$id" ]
     then
-        echo "Needs Identity. Current Ones Are:"
-        list_ids
+        echo "ERROR: Needs to pass id nickname. Valid ones are:" 1>&2
+        list_ids 1>&2
         exit 1
     fi
     cd "${3:-.}"
 
     if ! list_ids | grep --silent -E "^$id$"
     then
-        echo "$id is not a valid id. Valid ids are:"
-        list_ids
+        echo "ERROR: $id is not a valid id nickname. Valid ones are:" 1>&2
+        list_ids 1>&2
         exit 1
     fi
 
@@ -47,5 +55,20 @@ then
     set_config "$id" 'name'
     set_config "$id" 'email'
     set_config "$id" 'signingkey'
-fi
 
+elif [ "$1" = "-h" -o "$1" = "--help" ]
+then
+    echo "Set predefined git commit identity information for a repository"
+    echo ""
+    print_usage
+
+else
+    if [ -z "$1" ]
+    then
+        echo "ERROR: Needs argument(s)" 1>&2
+    else
+        echo "ERROR: $1 is not a valid first argument" 1>&2
+    fi
+    print_usage 1>&2
+    exit 1
+fi
