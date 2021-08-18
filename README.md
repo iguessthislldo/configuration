@@ -48,34 +48,44 @@ My framework for my configuration/dot files.
 This doesn't include `sh/rc.d/50_aliases.sh` or aliases added by oh-my-zsh in
 `sh/rc.d/00_oh-my-zsh.zsh`.
 
-#### `u [COUNT]`
+#### `u`
+
+Usage: `u [COUNT]`
 
 Move up COUNT number of directories, like `cd (../)*COUNT`. COUNT is 1 by
 default.
 
 #### `e`
 
-Python script that passes through to `$EDITOR`.
+Usage: `e [ARGS...]`
+
+Python script that passes arguments through to `$EDITOR`.
 
 If the `$EDITOR` has `vi` in the name, then it assumes it's vi-compatible and
 will change arguments of the form `FILENAME:NUMBER` to `FILENAME +NUMBER`.
 
 #### `gitid`
 
-Set git commit identity information for current repository.
+Set predefined git commit identity information for a repository.
 
-TODO: More info
+See `gitid -h` for usage.
+
+TODO: Info on how to setup identities
 
 #### `new`
 
 Create copies of a template directory, optionally automatically replacing
 macros and executing scripts.
 
-TODO: More info
+See `new -h` for usage.
+
+TODO: More info, like how to setup templates
 
 #### `makej`
 
-Run `make`, but pass `-j` and the number of CPU cores plus 1.
+Usage: `makej [ARGS...]`
+
+Run `make` with `ARGS`, but also pass `-j` and the number of CPU cores plus 1.
 
 #### `setenv`
 
@@ -91,10 +101,14 @@ TODO: Merge or make like `setenv`.
 
 #### `args`
 
+Usage: `args [ARGS...]`
+
 Simple python script that lists the arguments it was passed. Use to see how the
 shell is passing arguments to a program.
 
-#### `h DAYS`
+#### `h`
+
+Usage: `h DAYS`
 
 Print the shell history for the given number of days ago, which can be 0 for
 today.
