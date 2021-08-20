@@ -89,6 +89,10 @@ let mapleader = ","
 vnoremap <leader>y "+y
 nnoremap <leader>p "+p
 
+if !has('clipboard')
+   echom "WARNING: Can not use clipboard! (Missing xclip?)"
+endif
+
 " NO NOT AUTOINDENT UNLESS ENTER IS PRESSED
 autocmd BufReadPre,FileReadPre setlocal indentkeys=*<Return>
 
