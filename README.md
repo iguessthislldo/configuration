@@ -90,14 +90,13 @@ Run `make` with `ARGS`, but also pass `-j` and the number of CPU cores plus 1.
 #### `setenv`
 
 Command checks the current directory and all of its parents for `setenv.sh`,
-and starts the current shell with that `setenv.sh` sourced.
+and starts an instance of the current shell with that `setenv.sh` sourced.
 
 #### `activate`
 
 Command checks the current directory and all of its parents for a Python
-virtualenv, and sources it.
-
-TODO: Merge or make like `setenv`.
+virtualenv, and starts an instance of the current shell with that virtualenv
+activated.
 
 #### `args`
 
