@@ -7,6 +7,11 @@
 
 igtd_recursive_source="$1"
 
+if [ ! -z "${2+x}" ]
+then
+    export IGTD_ENV_NAME="$2${IGTD_ENV_NAME+, ${IGTD_ENV_NAME}}"
+fi
+
 igtd_recursive_source_orig_dir="$(pwd)"
 
 while [[ ! -f "$igtd_recursive_source" && "$(pwd)" != "/" ]]

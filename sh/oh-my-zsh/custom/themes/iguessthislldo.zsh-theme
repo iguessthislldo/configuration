@@ -89,8 +89,32 @@ function igtd-var-notify {
 }
 
 # Tie it all together ========================================================
+function igtd-cmd-status {
+    local str
+    if [ -n "${IGTD_CMD_EXIT_STATUS}" ]
+    then
+        str="$(segment red "$IGTD_ERROR ${IGTD_CMD_EXIT_STATUS}")"
+    fi
+    if [ -n "$IGTD_CMD_TIME" ]
+    then
+        str="$str$(segment green "${IGTD_CMD_TIME}ms" )"
+    fi
+    if [ -n "$str" ]
+    then
+        echo -n "$str"
+    fi
+}
+
 function prompt_top {
-    segment blue '%n @ %M'
+    if [ ! -z ${SSH_CLIENT+x} ]
+    then
+        segment blue '%n @ %M'
+    fi
+
+    if [ ! -z ${IGTD_ENV_NAME+x} ]
+    then
+        segment magenta "${IGTD_ENV_NAME}"
+    fi
 
     segment yellow "$(date +%T)"
 
@@ -105,6 +129,6 @@ function prompt_top {
     prompt_git
 }
 
-PROMPT='%(?..$(segment red "$IGTD_ERROR %?"))$(prompt_top)
+PROMPT='$(igtd-cmd-status)
+$(prompt_top)
 $IGTD_BEGIN_SEGMENT%S%1(CC%~C)%#%s'
-#RPROMPT='%(?..$(segment red "$IGTD_ERROR %?"))'

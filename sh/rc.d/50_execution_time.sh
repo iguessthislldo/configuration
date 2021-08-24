@@ -1,13 +1,21 @@
 function preexec() {
-  __execution_time=$(($(date +%s%N)/1000000))
+    IGTD_CMD_TIME_BEGIN=$(($(date +%s%N)/1000000))
 }
 
 function precmd() {
-  if [ $__execution_time ]; then
-    local now=$(($(date +%s%N)/1000000))
-    local elapsed=$(($now-$__execution_time))
+    local exit_status=$?
 
-    export RPROMPT="%F{cyan}${elapsed}ms %{$reset_color%} $RPROMT"
-    unset $__execution_time
-  fi
+    if [ $IGTD_CMD_TIME_BEGIN ]
+    then
+        if [ $exit_status -ne 0 ]
+        then
+            export IGTD_CMD_EXIT_STATUS=$exit_status
+        else
+            unset IGTD_CMD_EXIT_STATUS
+        fi
+
+        local now=$(($(date +%s%N)/1000000))
+        export IGTD_CMD_TIME=$(($now-$IGTD_CMD_TIME_BEGIN))
+        unset IGTD_CMD_TIME_BEGIN
+    fi
 }
