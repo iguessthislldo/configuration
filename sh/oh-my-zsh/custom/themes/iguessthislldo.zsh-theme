@@ -97,7 +97,7 @@ function igtd-cmd-status {
     fi
     if [ -n "$IGTD_CMD_TIME" ]
     then
-        str="$str$(segment green "${IGTD_CMD_TIME}ms" )"
+        str="$str$(segment green "${IGTD_CMD_TIME}" )"
     fi
     if [ -n "$str" ]
     then
