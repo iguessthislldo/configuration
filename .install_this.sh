@@ -9,4 +9,7 @@ InstallLink sh/environment.sh .zshenv
 # neovim
 InstallLink vim .config/nvim
 
+# ptpython
+InstallLink ptpython.py .config/ptpython/config.py
+
 Scan
