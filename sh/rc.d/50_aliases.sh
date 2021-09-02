@@ -1,11 +1,6 @@
-alias r="source ~/.zshenv;source ~/.zshrc"
-alias p="sudo pacman"
 alias o="xdg-open"
-alias apt="sudo apt"
 alias awk="gawk" # Always use gawk
-alias s="sudo systemctl"
-alias vim="nvim"
-alias ipy="ipython3"
+alias p="ptpython3"
 alias P="$EDITOR -R -"
 alias lP="l|P"
 alias llP="ll|P"
