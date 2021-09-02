@@ -10,4 +10,10 @@ else
     cd "ACE_TAO"
 fi
 git remote add upstream git@github.com:DOCGroup/ACE_TAO.git
+if ! %oci_tao% 
+then
+    git fetch upstream master
+    git merge --ff-only upstream/master
+    git push
+fi
 gitid use work
