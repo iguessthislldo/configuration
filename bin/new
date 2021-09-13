@@ -12,8 +12,19 @@ from subprocess import check_call
 
 template_var_arg_re = re.compile(r'(\w+)=(.*)')
 template_re = re.compile(r'(?<!\\)%(\w+)%')
-templates_path = (Path(os.environ['CONFIG']) / 'new').resolve()
 
+# Paths
+config_json_name = 'new.json'
+template_dir_name = 'templates'
+global_config_dir_path = (Path(os.environ['CONFIG']) / 'new').resolve()
+global_template_dir_path = global_config_dir_path / template_dir_name
+local_config_dir_subpath = Path('.new')
+local_template_dir_subpath = local_config_dir_subpath / template_dir_name
+
+# Builtin Template Variable Names
+post_command_var = 'new_post_command'
+dest_var = 'dest'
+this_base_dir_var = 'new_this_base_dir'
 
 def expect(name, expected, result):
     if result != expected:
@@ -68,40 +79,82 @@ easy\%escaped%
     expect('detect infinite loop', True, caught)
 
 
-def read_new_json(dir_path, template_vars, recursive=False):
-    dir_paths = [dir_path]
+def first(it):
+    for i in it:
+        return i
+    return None
+
+
+def find_paths(base_path, sub_path,
+        recursive=False, check=Path.exists, parents_first=True):
+    check_paths = [base_path]
     if recursive:
-        dir_paths.extend(dir_path.parents)
-    for dir_path in reversed(dir_paths):
-        path = dir_path / 'new.json'
-        if path.exists():
-            with path.open() as f:
-                for name, value in json.load(f).items():
-                    template_vars[name] = resolve({'new_json_dir': str(dir_path)}, value,
-                        restrict=lambda s: s == 'new_json_dir')
+        check_paths.extend([p.resolve() for p in base_path.parents])
+        if parents_first:
+            check_paths.reverse()
+    for check_path in check_paths:
+        path = check_path / sub_path
+        if check(path):
+            yield path
+
+
+def find_template(kind, dest_path):
+    t = first(find_paths(dest_path, local_template_dir_subpath / kind,
+        recursive=True, check=Path.is_dir))
+    if t is not None:
+        return t
+
+    t = global_template_dir_path / kind
+    if t.is_dir():
+        return t
+
+    raise ValueError('Could not find template named: ' + repr(kind))
+
+
+def read_new_json(dir_path, template_vars, recursive=False, dir_subpath=None):
+    subpath = config_json_name
+    if dir_subpath is not None:
+        subpath = dir_subpath / subpath
+    for path in find_paths(dir_path, subpath, recursive=recursive, check=Path.is_file):
+        print('Reading', repr(str(path)))
+        with path.open() as f:
+            for name, value in json.load(f).items():
+                template_vars[name] = resolve({this_base_dir_var: str(path.parent.parent)}, value,
+                    restrict=lambda s: s == this_base_dir_var)
 
 
 def new(kind, dest_path, override_vars={}):
     dest_path = dest_path.resolve()
-    template_path = templates_path / kind
+    print('Destination is', repr(str(dest_path)))
+
+    template_path = find_template(kind, dest_path)
+    print('Template is', repr(str(template_path)))
+
     template_vars = {}
-    read_new_json(templates_path, template_vars)
-    read_new_json(template_path, template_vars)
-    read_new_json(dest_path, template_vars, recursive=True)
-    template_vars['dest'] = str(dest_path)
+    read_new_json(global_config_dir_path, template_vars)
+    read_new_json(template_path, template_vars, dir_subpath=local_config_dir_subpath)
+    read_new_json(dest_path, template_vars, recursive=True, dir_subpath=local_config_dir_subpath)
+    template_vars[dest_var] = str(dest_path)
     print(template_vars)
     template_vars.update(override_vars)
     for path in template_path.rglob('*'):
-        if path.name == 'new.json':
+        if path.name == str(local_config_dir_subpath) and path.is_dir():
             continue
         rel = path.relative_to(template_path)
-        print(rel)
+        print('Copying', repr(str(rel)))
         new_path = dest_path / rel
         new_path.parent.mkdir(parents=True, exist_ok=True)
-        new_path.write_text(resolve(template_vars, path.read_text()))
+        if path.is_dir():
+            new_path.mkdir(parents=True, exist_ok=True)
+        elif path.is_file():
+            new_path.write_text(resolve(template_vars, path.read_text()))
+        else:
+            sys.exit('{} is not a file or a directory'.format(repr(str(path))))
         new_path.chmod(path.stat().st_mode)
-    if 'new_post_command' in template_vars:
-        check_call(resolve(template_vars, template_vars['new_post_command']), cwd=dest_path)
+    if post_command_var in template_vars:
+        post_command = resolve(template_vars, template_vars[post_command_var])
+        print('Running', ' '.join([repr(i) for i in post_command]))
+        check_call(post_command, cwd=dest_path)
 
 
 def run_tests():
