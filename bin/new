@@ -100,12 +100,12 @@ def find_paths(base_path, sub_path,
 
 def find_template(kind, dest_path):
     t = first(find_paths(dest_path, local_template_dir_subpath / kind,
-        recursive=True, check=Path.is_dir))
+        recursive=True))
     if t is not None:
         return t
 
     t = global_template_dir_path / kind
-    if t.is_dir():
+    if t.exists():
         return t
 
     raise ValueError('Could not find template named: ' + repr(kind))
@@ -130,27 +130,52 @@ def new(kind, dest_path, override_vars={}):
     template_path = find_template(kind, dest_path)
     print('Template is', repr(str(template_path)))
 
+    # Get variables
     template_vars = {}
     read_new_json(global_config_dir_path, template_vars)
     read_new_json(template_path, template_vars, dir_subpath=local_config_dir_subpath)
     read_new_json(dest_path, template_vars, recursive=True, dir_subpath=local_config_dir_subpath)
     template_vars[dest_var] = str(dest_path)
-    print(template_vars)
     template_vars.update(override_vars)
-    for path in template_path.rglob('*'):
-        if path.name == str(local_config_dir_subpath) and path.is_dir():
-            continue
-        rel = path.relative_to(template_path)
+    print('Variable values are:')
+    for name, value in template_vars.items():
+        print(' - {}: {}'.format(name, repr(value)))
+
+    # Read and resolve template contents
+    new_items = []
+    if template_path.is_dir():
+        # Allow for empty directory template
+        new_items.append((template_path, '(template base directory)', dest_path, True, None))
+        for path in template_path.rglob('*'):
+            if path.name == str(local_config_dir_subpath) and path.is_dir():
+                continue
+            rel = path.relative_to(template_path)
+            new_path = dest_path / rel
+            if path.is_file():
+                is_dir = False
+                contents = resolve(template_vars, path.read_text())
+            elif path.is_dir():
+                is_dir = True
+                contents = None
+            else:
+                sys.exit('{} is not a file or a directory'.format(repr(str(path))))
+            new_items.append((path, rel, new_path, is_dir, contents))
+    else:
+        new_items.append((template_path, '(template base file)', dest_path,
+            False, resolve(template_vars, template_path.read_text())))
+
+    # Create directories and write files
+    for path, rel, new_path, is_dir, contents in new_items:
+        print(path, rel, new_path, is_dir, repr(contents))
         print('Copying', repr(str(rel)))
-        new_path = dest_path / rel
-        new_path.parent.mkdir(parents=True, exist_ok=True)
-        if path.is_dir():
+        if is_dir:
             new_path.mkdir(parents=True, exist_ok=True)
-        elif path.is_file():
-            new_path.write_text(resolve(template_vars, path.read_text()))
         else:
-            sys.exit('{} is not a file or a directory'.format(repr(str(path))))
+            new_path.parent.mkdir(parents=True, exist_ok=True)
+            new_path.write_text(contents)
         new_path.chmod(path.stat().st_mode)
+
+    # Post command
     if post_command_var in template_vars:
         post_command = resolve(template_vars, template_vars[post_command_var])
         print('Running', ' '.join([repr(i) for i in post_command]))
