@@ -43,11 +43,11 @@ set hlsearch
 " Ignore case when searching
 set ignorecase
 
-" When searching try to be smart about cases 
+" When searching try to be smart about cases
 set smartcase
 
 " Makes search act like search in modern browsers
-set incsearch 
+set incsearch
 
 " Folding
 setlocal foldmethod=syntax
