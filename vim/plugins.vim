@@ -51,12 +51,19 @@ let g:zig_fmt_autosave = 0
 
 " lspconfig
 lua << EOF
-require'lspconfig'.clangd.setup{}
-require'lspconfig'.perlls.setup{}
-
--- bridle
 local lspconfig = require'lspconfig'
 local configs = require'lspconfig/configs'
+local util = require 'lspconfig/util'
+
+-- C/C++
+lspconfig.clangd.setup{
+    root_dir = util.root_pattern('compile_commands.json'),
+}
+
+-- Perl
+lspconfig.perlls.setup{}
+
+-- IDL
 if not lspconfig.bridle then
     configs.bridle = {
         default_config = {
