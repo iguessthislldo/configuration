@@ -98,6 +98,11 @@ Command checks the current directory and all of its parents for a Python
 virtualenv, and starts an instance of the current shell with that virtualenv
 activated.
 
+#### `rrun`
+
+Recursively check the current directory and all of its parents for a file with
+an execute permission on it and executes it.
+
 #### `args`
 
 Usage: `args [ARGS...]`
