@@ -8,9 +8,9 @@ from pathlib import Path
 from argparse import ArgumentParser
 import json
 from subprocess import check_call
+import itertools
 
 
-template_var_arg_re = re.compile(r'(\w+)=(.*)')
 template_re = re.compile(r'(?<!\\)%(\w+)%')
 
 # Paths
@@ -86,7 +86,7 @@ def first(it):
 
 
 def find_paths(base_path, sub_path,
-        recursive=False, check=Path.exists, parents_first=True):
+        recursive=False, check=Path.exists, parents_first=True, find_all=False):
     check_paths = [base_path]
     if recursive:
         check_paths.extend([p.resolve() for p in base_path.parents])
@@ -94,20 +94,31 @@ def find_paths(base_path, sub_path,
             check_paths.reverse()
     for check_path in check_paths:
         path = check_path / sub_path
-        if check(path):
-            yield path
+        for p in path.glob('*') if find_all else [path]:
+            if check(path):
+                yield p
+
+
+def template_iter(dest_path, kind=None):
+    find_all = kind is None
+    if find_all:
+        kind = ''
+    encountered = set()
+    it = itertools.chain(
+        find_paths(dest_path, local_template_dir_subpath / kind,
+            recursive=True, find_all=find_all),
+        find_paths(global_template_dir_path, kind, find_all=find_all),
+    )
+    for i in it:
+        if i.name not in encountered:
+            encountered |= {i.name,}
+            yield i
 
 
 def find_template(kind, dest_path):
-    t = first(find_paths(dest_path, local_template_dir_subpath / kind,
-        recursive=True))
+    t = first(template_iter(dest_path, kind))
     if t is not None:
         return t
-
-    t = global_template_dir_path / kind
-    if t.exists():
-        return t
-
     raise ValueError('Could not find template named: ' + repr(kind))
 
 
@@ -123,7 +134,7 @@ def read_new_json(dir_path, template_vars, recursive=False, dir_subpath=None):
                     restrict=lambda s: s == this_base_dir_var)
 
 
-def new(kind, dest_path, override_vars={}):
+def new(kind, dest_path, override_vars={}, dry_run=True):
     dest_path = dest_path.resolve()
     print('Destination is', repr(str(dest_path)))
 
@@ -166,44 +177,32 @@ def new(kind, dest_path, override_vars={}):
 
     # Create directories and write files
     for path, rel, new_path, is_dir, contents in new_items:
-        print(path, rel, new_path, is_dir, repr(contents))
         print('Copying', repr(str(rel)))
-        if is_dir:
-            new_path.mkdir(parents=True, exist_ok=True)
+        if dry_run:
+            print('mode:', path.stat())
+            if is_dir:
+                print('(Directory)')
+            else:
+                print('START FILE ====================================================================')
+                print(contents)
+                print('END FILE ======================================================================')
         else:
-            new_path.parent.mkdir(parents=True, exist_ok=True)
-            new_path.write_text(contents)
-        new_path.chmod(path.stat().st_mode)
+            if is_dir:
+                new_path.mkdir(parents=True, exist_ok=True)
+            else:
+                new_path.parent.mkdir(parents=True, exist_ok=True)
+                new_path.write_text(contents)
+            new_path.chmod(path.stat().st_mode)
 
     # Post command
     if post_command_var in template_vars:
         post_command = resolve(template_vars, template_vars[post_command_var])
-        print('Running', ' '.join([repr(i) for i in post_command]))
-        check_call(post_command, cwd=dest_path)
+        print('Would run' if dry_run else 'Running',
+            ' '.join([repr(i) for i in post_command]))
+        if not dry_run:
+            check_call(post_command, cwd=dest_path)
 
 
 def run_tests():
     test_resolve()
     print('Tests Finished')
-
-
-if __name__ == '__main__':
-    argparser = ArgumentParser()
-    argparser.add_argument('kind')
-    argparser.add_argument('dest', type=Path, nargs='?', default=Path('.'))
-    argparser.add_argument('-D', dest='template_vars', default=[], action='append')
-    args = argparser.parse_args()
-
-    if args.kind == 'test':
-        run_tests()
-        sys.exit()
-
-    template_vars = {}
-    for arg in args.template_vars:
-        m = template_var_arg_re.fullmatch(arg)
-        if not m:
-            sys.exit(repr(arg) +
-                " is not a valid argument to -D. Must be in the form of -D name=value")
-        template_vars[m.group(1)] = m.group(2)
-
-    new(args.kind, args.dest, override_vars=template_vars)
