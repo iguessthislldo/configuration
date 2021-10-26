@@ -24,16 +24,13 @@ Plug 'airblade/vim-gitgutter'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'ziglang/zig.vim'
 Plug 'nvie/vim-flake8'
-Plug 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
+Plug 'neovim/nvim-lspconfig'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 
 " Use local copy of vim-opendds, else download it
 if isdirectory(expand('$LOCAL_VIM_OPENDDS'))
-    Plug '~/oci/dds/vim-opendds'
+    Plug expand('$LOCAL_VIM_OPENDDS')
 else
     Plug 'iguessthislldo/vim-opendds'
 endif
@@ -47,21 +44,30 @@ let g:airline_powerline_fonts = 1
 let g:airline_theme="simple"
 
 " Gitgutter
-let g:gitgutter_max_signs = 1000
+let g:gitgutter_max_signs = 10000
 
 " Zig
 let g:zig_fmt_autosave = 0
 
-" Language Client
-let g:LanguageClient_serverCommands = {
-  \ 'cpp': ['clangd'],
-  \ }
-function LC_maps()
-    if has_key(g:LanguageClient_serverCommands, &filetype)
-        nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
-        nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
-        nnoremap <buffer> <silent> gi :call LanguageClient#textDocument_implementation()<CR>
-        nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-    endif
-endfunction
-autocmd FileType * call LC_maps()
+" lspconfig
+lua << EOF
+require'lspconfig'.clangd.setup{}
+require'lspconfig'.perlls.setup{}
+
+-- bridle
+local lspconfig = require'lspconfig'
+local configs = require'lspconfig/configs'
+if not lspconfig.bridle then
+    configs.bridle = {
+        default_config = {
+            cmd = {'bridle', 'lang-server'};
+            filetypes = {'opendds_idl'};
+            root_dir = function(fname)
+                return lspconfig.util.find_git_ancestor(fname);
+            end;
+            settings = {};
+        }
+    }
+end
+lspconfig.bridle.setup{}
+EOF
