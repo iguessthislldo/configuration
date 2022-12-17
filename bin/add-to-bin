@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+if [ "$#" == "1" ]
+then
+    target="$(realpath "$1")"
+    name="$(basename "$1")"
+elif [ "$#" == "2" ]
+then
+    target="$(realpath "$1")"
+    name="$2"
+else
+    echo "usage: add-to-bin REAL_FILE [NAME]"
+    exit 1
+fi
+
+bin="$HOME/bin"
+mkdir --parents "$bin"
+
+ln --symbolic --force "$target" "$bin/$name"

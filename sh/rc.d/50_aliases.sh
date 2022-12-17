@@ -1,5 +1,4 @@
 alias o="xdg-open"
-alias awk="gawk" # Always use gawk
 alias p="ptpython3"
 alias P="$EDITOR -R -"
 alias lP="l|P"
