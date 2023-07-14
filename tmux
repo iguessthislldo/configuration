@@ -1,4 +1,3 @@
-set -g default-terminal "screen-256color"
 set-window-option -g mode-keys vi
 
 # moving between panes with vim movement keys

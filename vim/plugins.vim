@@ -27,6 +27,7 @@ Plug 'nvie/vim-flake8'
 Plug 'neovim/nvim-lspconfig'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
+Plug 'habamax/vim-rst'
 
 " Use local copy of vim-opendds, else download it
 if isdirectory(expand('$LOCAL_VIM_OPENDDS'))
@@ -36,6 +37,8 @@ else
 endif
 
 call plug#end()
+
+set completeopt=menu,menuone,noselect
 
 " -------------------- Plugins Settings --------------------
 
@@ -62,19 +65,3 @@ lspconfig.clangd.setup{
 
 -- Perl
 lspconfig.perlls.setup{}
-
--- IDL
-if not lspconfig.bridle then
-    configs.bridle = {
-        default_config = {
-            cmd = {'bridle', 'lang-server'};
-            filetypes = {'opendds_idl'};
-            root_dir = function(fname)
-                return lspconfig.util.find_git_ancestor(fname);
-            end;
-            settings = {};
-        }
-    }
-end
-lspconfig.bridle.setup{}
-EOF

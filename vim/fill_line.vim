@@ -1,7 +1,7 @@
 function! FillLine(arg)
     let l:max_line_length = &textwidth == 0 ? 79 : &textwidth
     let l:line = getline('.')
-    const pat = escape(a:arg, '/\') . "\\+$"
+    const pat = escape(a:arg, '/\\.') . "\\+$"
     let l:line = substitute(l:line, pat, "", "")
     const lastc = l:line[-1:]
     const existing = lastc ==? a:arg

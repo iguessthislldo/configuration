@@ -12,4 +12,6 @@ InstallLink vim .config/nvim
 # ptpython
 InstallLink ptpython.py .config/ptpython/config.py
 
+InstallLink tmux .tmux.conf
+
 Scan
