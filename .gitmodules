@@ -1,3 +1,12 @@
 [submodule "sh/oh-my-zsh/ohmyzsh"]
 	path = sh/oh-my-zsh/ohmyzsh
 	url = https://github.com/ohmyzsh/ohmyzsh
+[submodule "sh/oh-my-zsh/custom/plugins/nix-shell"]
+	path = sh/oh-my-zsh/custom/plugins/nix-shell
+	url = https://github.com/chisui/zsh-nix-shell.git
+[submodule "sh/oh-my-zsh/custom/plugins/autoupdate"]
+	path = sh/oh-my-zsh/custom/plugins/autoupdate
+	url = https://github.com/Dave4272-Office/autoupdate-oh-my-zsh-plugins
+[submodule "sh/oh-my-zsh/custom/plugins/nix-zsh-completions"]
+	path = sh/oh-my-zsh/custom/plugins/nix-zsh-completions
+	url = git@github.com:spwhitt/nix-zsh-completions.git

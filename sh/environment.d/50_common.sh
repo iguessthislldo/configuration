@@ -23,7 +23,9 @@ then
     export LANG=en_US.UTF-8
 fi
 
-export PATH="$CONFIG/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+igtd_add_to_path "$HOME/.local/bin"
+igtd_add_to_path "$HOME/bin"
+igtd_add_to_path "$CONFIG/bin"
 
 if [ -z ${XDG_CONFIG_HOME+x} ]
 then

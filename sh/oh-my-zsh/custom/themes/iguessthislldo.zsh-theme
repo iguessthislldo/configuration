@@ -68,17 +68,25 @@ function prompt_git {
 function igtd-var-notify {
     local result
     result=""
-    typeset -A var_notify
-    var_notify[DDS_ROOT]=D
-    var_notify[ACE_ROOT]=A
-    var_notify[TAO_ROOT]=T
-
-    local var
-    for var in $(env | cut -d '=' -f 1)
+    local count
+    count=${#IGTD_VAR_NOTIFY[@]}
+    local i
+    for ((i = 0; i < count; ++i))
     do
-        if [ -n ${var_notify[$var]+x} ]
+        local name_value="${IGTD_VAR_NOTIFY[@]:$i:1}"
+        i=$((i+1))
+        local symbol="${IGTD_VAR_NOTIFY[@]:$i:1}"
+        if [[ $name_value =~ ^([^=]+)=(.*) ]]
         then
-            result="$result${var_notify[$var]}"
+            if [[ "$(print -rl -- ${(P)match[1]})" == "${match[2]}" ]]
+            then
+                result="$result$symbol"
+            fi
+        else
+            if [[ -v $name_value ]]
+            then
+                result="$result$symbol"
+            fi
         fi
     done
 

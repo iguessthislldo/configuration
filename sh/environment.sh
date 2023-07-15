@@ -24,6 +24,13 @@ then
     export IGTD_MACHINE_ID=$(cat /etc/machine-id)
 fi
 
+function igtd_add_to_path {
+    if [[ ":$PATH:" != *":$1:"* ]]
+    then
+        export PATH="$1:$PATH"
+    fi
+}
+
 source "$CONFIG/sh/igtd_sh_loader.sh"
 function igtd_sh_source_config {
     if [ -z ${IGTD_SH_LOADER_DEBUG+x} ]
@@ -46,4 +53,4 @@ function igtd_sh_source_config {
 }
 igtd_sh_source_config
 igtd_sh_loader "$CONFIG/sh/environment.d"
-unset -f igtd_sh_source_config igtd_sh_loader
+unset -f igtd_sh_source_config igtd_sh_loader igtd_add_to_path
