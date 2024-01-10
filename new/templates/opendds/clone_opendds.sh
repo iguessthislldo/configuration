@@ -6,6 +6,7 @@ git clone git@github.com:iguessthislldo/OpenDDS.git
 
 cd "OpenDDS"
 git remote add upstream git@github.com:OpenDDS/OpenDDS.git
+gh repo set-default OpenDDS/OpenDDS
 git fetch upstream master
 git merge --ff-only upstream/master
 git push
