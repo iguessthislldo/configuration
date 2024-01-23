@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 git config --global core.excludesfile $CONFIG/git/global_ignore
 

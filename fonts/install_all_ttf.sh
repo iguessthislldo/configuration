@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 FONTS_DIR=/usr/share/fonts/TTF
 
