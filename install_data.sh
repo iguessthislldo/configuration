@@ -4,9 +4,10 @@ set -e
 
 subscript=".install_this.sh"
 install_data="$(realpath -s /data)"
+install_cfg="$(realpath -s $install_data/configuration)"
 install_home="$(realpath -s $HOME)"
-export_list="$(realpath -s "$install_data/configuration/export-list")"
-export_txz="$(realpath -s "$install_data/configuration/export.txz")"
+export_list="$(realpath -s "$install_cfg/export-list")"
+export_txz="$(realpath -s "$install_cfg/export.txz")"
 doing_export=false
 doing_install=false
 
@@ -123,6 +124,16 @@ function action_install {
     InstallLink work work
 
     Scan
+
+    cd $install_cfg
+    echo 'Make sure git origin is SSH'
+    origin='git@github.com:iguessthislldo/configuration.git'
+    if [ "$(git remote get-url origin)" != "$origin" ]
+    then
+        git remote set-url origin $origin
+    else
+        echo "Already set to $origin"
+    fi
 }
 
 function action_export {
