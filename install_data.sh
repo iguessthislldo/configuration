@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -15,6 +15,17 @@ function paths_are_same {
     b=$(readlink -f $2)
     test $a -ef $b
     return $?
+}
+
+function ask {
+    while true; do
+        read -p "${@}? " yn
+        case $yn in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            * ) echo "Please answer y(es) or n(o).";;
+        esac
+    done
 }
 
 function InstallRun {
@@ -41,14 +52,18 @@ function InstallLink {
     if [ -e $link ]; then
         if ! paths_are_same $file $link ; then
             echo "Error: File/Directory already exists: $link" 1>&2
-            exit 1
+            if ask "Remove existing $link" ; then
+                rm -fr "$link"
+            else
+                exit 1
+            fi
         else
             echo "Already Done"
+            return 0
         fi
-    else
-        ln -s $file $link
-        echo "Done"
     fi
+    ln -s $file $link
+    echo "Done"
 }
 
 function InstallDir {
@@ -87,6 +102,26 @@ function action_install {
     doing_install=true
     cd $install_data
     InstallLink dat
+
+    InstallDir bin
+
+    mkdir -p downloads
+    InstallLink downloads dl
+    mkdir -p documents
+    InstallLink documents docs
+    mkdir -p music
+    InstallLink music music
+    mkdir -p pictures
+    InstallLink pictures pics
+    mkdir -p videos
+    InstallLink videos vids
+    mkdir -p src
+    InstallLink src src
+    mkdir -p dev
+    InstallLink dev dev
+    mkdir -p work
+    InstallLink work work
+
     Scan
 }
 

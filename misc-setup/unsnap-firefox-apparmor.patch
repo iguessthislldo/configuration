@@ -1,0 +1,24 @@
+diff --git a/usr.bin.firefox.orig b/usr.bin.firefox
+index 16ee748..f3b2a78 100644
+--- a/usr.bin.firefox
++++ b/usr.bin.firefox
+@@ -165,8 +165,9 @@ profile firefox /usr/lib/firefox/firefox{,*[^s][^h]} {
+   owner @{HOME}/ r,
+   owner @{HOME}/Public/ r,
+   owner @{HOME}/Public/* r,
+-  owner @{HOME}/Downloads/ r,
+-  owner @{HOME}/Downloads/* rw,
++  owner /data/ r,
++  owner /data/** rw,
++  deny /data/configuration/** w,
+ 
+   # per-user firefox configuration
+   owner @{HOME}/.{firefox,mozilla}/ rw,
+@@ -174,6 +175,7 @@ profile firefox /usr/lib/firefox/firefox{,*[^s][^h]} {
+   owner @{HOME}/.{firefox,mozilla}/**/*.{db,parentlock,sqlite}* k,
+   owner @{HOME}/.{firefox,mozilla}/plugins/** rm,
+   owner @{HOME}/.{firefox,mozilla}/**/plugins/** rm,
++  owner @{HOME}/.{firefox,mozilla}/**/gmp-widevinecdm/*/lib*so m,
+   owner @{HOME}/.gnome2/firefox* rwk,
+   owner @{HOME}/.cache/mozilla/{,firefox/} rw,
+   owner @{HOME}/.cache/mozilla/firefox/** rw,

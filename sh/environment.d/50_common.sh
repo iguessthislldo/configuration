@@ -3,10 +3,7 @@ then
     export ARCHFLAGS="-arch x86_64"
 fi
 
-if [ -z ${EDITOR+x} ]
-then
-    export EDITOR=nvim
-fi
+export EDITOR=nvim
 
 if [ -z ${IGTD_EDITOR_IS_VI+x} ]
 then

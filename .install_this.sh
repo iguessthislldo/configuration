@@ -14,4 +14,6 @@ InstallLink ptpython.py .config/ptpython/config.py
 
 InstallLink tmux .tmux.conf
 
+InstallLink user-dirs.dir .config/user-dirs.dirs
+
 Scan
