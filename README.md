@@ -4,29 +4,38 @@ My framework for my configuration/dot files.
 
 ## Setup
 
-1. Make sure these programs are installed:
+- Install [Nix](https://nix.dev/install-nix#install-nix)
+- Make sure these programs are installed:
     - Zsh
-    - Neovim
-    - Git
     - GnuPG
-    - xclip
-   For Debian: `sudo apt install zsh gnupg git xclip`
-2. Create a `/data` directory (TODO: Ability to have it somewhere else?)
-3. Place this repository at `/data/configuration`.
-4. `git submodule init && git submodule update`
-5. `bash install_data.sh` to do the initial setup, clearing existing default
-   stuff in the home directory and repeating the command as necessary until
-   it's able to finish.
-6. Set Zsh as the default shell, for example: `chsh -s /usr/bin/zsh`
-7. At this point now or later we can either run `zsh` manually or relogin to
-   have it take its place as the default shell.
-7. `bash install_data.sh import HOST` where `HOST` is the ssh argument for
-   the computer to copy private files from. Make sure an SSH server is
-   installed and running.
-8. `bash install_data.sh` one final time to have it take up the imported files.
-9. Set terminal font if desired.
-10. Run `(cd ~/cfg/git && bash setup.sh)` to setup Git.
-11. Run scripts in `misc-setup` as needed.
+    - xclip (optional?)
+    - Ex: `sudo apt install zsh gnupg xclip`
+- Create a `/data` directory (TODO: Ability to have it somewhere else?)
+- Place/clone this repository at `/data/configuration`.
+- `nix-env -if default.nix` (TODO: use better way to do this)
+- `git submodule init && git submodule update`
+- `bash install_data.sh` to do the initial setup, clearing existing default
+  stuff in the home directory and repeating the command as necessary until
+  it's able to finish.
+- Set Zsh as the default shell, for example: `chsh -s /usr/bin/zsh`
+- At this point now or later we can either run `zsh` manually or relogin to
+  have it take its place as the default shell.
+- If copying from an existing `/data` on a source system:
+    - To copy files using SSH:
+        - Make sure an SSH server is installed and running on the source
+          system.
+        - Run `bash install_data.sh import HOST` where `HOST` on the
+          destination system.
+    - To copy files manually:
+        - Run `bash install_data.sh export` on the source system.
+        - Copy **`/data/configuration/export.txz` to `/data/export.txz`** on
+          the destination system.
+        - Run `bash install_data.sh import` on destination system.
+    - `bash install_data.sh` one final time to have it take up the imported
+      files.
+- Set terminal font if desired.
+- Run `(cd ~/cfg/git && bash setup.sh)` to setup Git.
+- Run scripts in `misc-setup` as needed.
 
 ## Directory Structure
 
