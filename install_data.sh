@@ -11,6 +11,12 @@ export_txz="$(realpath -s "$install_cfg/export.txz")"
 doing_export=false
 doing_install=false
 
+if [ -z ${XDG_CONFIG_HOME+x} ]
+then
+    export XDG_CONFIG_HOME="$HOME/.config"
+fi
+mkdir -p "$XDG_CONFIG_HOME"
+
 function paths_are_same {
     a=$(readlink -f $1)
     b=$(readlink -f $2)
