@@ -9,9 +9,13 @@ My framework for my configuration/dot files.
     - Zsh
     - GnuPG
     - xclip (optional?)
-    - Ex: `sudo apt install zsh gnupg xclip`
+    - git
+    - Ex: `sudo apt install zsh gnupg xclip git`
 - Create a `/data` directory (TODO: Ability to have it somewhere else?)
+    - `sudo mkdir /data`
+    - `sudo chown $USER:$USER /data`
 - Place/clone this repository at `/data/configuration`.
+    - `git clone https://github.com/iguessthislldo/configuration`
 - `nix-env -if default.nix` (TODO: use better way to do this)
 - `git submodule init && git submodule update`
 - `bash install_data.sh` to do the initial setup, clearing existing default
