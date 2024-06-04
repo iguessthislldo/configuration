@@ -7,7 +7,8 @@ install_data="$(realpath -s /data)"
 install_cfg="$(realpath -s $install_data/configuration)"
 install_home="$(realpath -s $HOME)"
 export_list="$(realpath -s "$install_cfg/export-list")"
-export_txz="$(realpath -s "$install_cfg/export.txz")"
+export_file="export.txz"
+export_path="$(realpath -s "$install_cfg/$export_file")"
 doing_export=false
 doing_install=false
 
@@ -132,7 +133,7 @@ function action_install {
     Scan
 
     cd $install_cfg
-    echo 'Make sure git origin is SSH'
+    echo 'Making sure git origin is SSH'
     origin='git@github.com:iguessthislldo/configuration.git'
     if [ "$(git remote get-url origin)" != "$origin" ]
     then
@@ -146,18 +147,26 @@ function action_export {
     echo Exporting \"$install_data\" to \"$install_home\"
 
     doing_export=true
-    rm -f $export_list $export_txz
+    rm -f $export_list $export_path
     cd $install_data
     Scan
-    tar --create --xz --file $export_txz --files-from $export_list
+    tar --create --xz --file $export_path --files-from $export_list
 }
 
 function action_import {
-    echo Importing from $1
-    ssh $1 'bash /data/configuration/install_data.sh export'
-    scp $1:/data/configuration/export.txz /data
+    if [ ! -z "$1" ]
+    then
+        echo "Importing from $1"
+        ssh $1 'bash /data/configuration/install_data.sh export'
+        scp $1:/data/configuration/$export_file /data
+    fi
     cd /data
-    tar xf export.txz
+    if [ ! -f "$export_file" ]
+    then
+        echo "Error: $export_file not found in `pwd`" 1>&2
+        exit 1
+    fi
+    tar xf "$export_file"
 }
 
 if [ "$#" == 0 ]
@@ -181,7 +190,7 @@ case $action in
     help | "--help" | "-h")
         echo "install_data.sh [install]"
         echo "install_data.sh export"
-        echo "install_data.sh import SSH_ARGS"
+        echo "install_data.sh import [SSH_ARGS]"
         ;;
     *)
         echo "Invalid action \"$action\""
