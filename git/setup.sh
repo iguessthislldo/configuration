@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 git config --global core.excludesfile $CONFIG/git/global_ignore
+git config --global push.autosetupremote true
+git config --global init.defaultBranch main
+# git config --global merge.conflictstyle zdiff3
 
 git config --global user.useConfigOnly true
 

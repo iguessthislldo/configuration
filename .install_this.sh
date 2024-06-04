@@ -10,7 +10,7 @@ InstallLink sh/environment.sh .zshenv
 InstallLink vim .config/nvim
 
 # ptpython
-InstallLink ptpython.py .config/ptpython/config.py
+#InstallLink ptpython.py .config/ptpython/config.py
 
 InstallLink tmux .tmux.conf
 
