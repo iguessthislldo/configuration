@@ -19,4 +19,4 @@ then
     exit 1
 fi
 
-echo "# config for ${IGTD_MACHINE_ID}\n\nexport IGTD_OS_NICKNAME=${1}" > "$path"
+echo -e '# config for '${IGTD_MACHINE_ID}'\n\nexport IGTD_OS_NICKNAME='${1} > "$path"
