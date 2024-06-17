@@ -4,5 +4,6 @@
     inherit (pkgs)
         neovim
         git
+        atuin
     ;
 }
