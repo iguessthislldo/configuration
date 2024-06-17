@@ -5,5 +5,6 @@
         neovim
         git
         atuin
+        ripgrep
     ;
 }
