@@ -6,5 +6,7 @@
         git
         atuin
         ripgrep
+        jq
+        #gh
     ;
 }
