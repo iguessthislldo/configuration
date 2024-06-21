@@ -19,11 +19,11 @@ IGTD_COMMIT=$'\ue729' # 
 IGTD_TAG=$'\uf02b' # 
 
 #TODO: convert symbols below to utf8 hex like above
-IGTD_CLEAN='%K{green}✔ %k'
+IGTD_CLEAN='%K{green} %k'
 IGTD_STAGED='%K{yellow}󰋗 %k'
-IGTD_UNMERGED='%K{yellow}✖ %k' #TODO
-IGTD_UNSTAGED='%K{red}✚ %k'
-IGTD_UNTRACKED='%K{red}⎙ %k'
+IGTD_UNMERGED='%K{red}󰅙 %k'
+IGTD_UNSTAGED='%K{red} %k'
+IGTD_UNTRACKED='%K{red}󱪞 %k'
 IGTD_AHEAD='%K{blue}  %k'
 IGTD_BEHIND='%K{blue}  %k'
 
@@ -31,6 +31,7 @@ IGTD_CLEAN_RE="nothing to commit, working tree clean"
 IGTD_STAGED_RE="Changes to be committed"
 IGTD_UNSTAGED_RE="Changes not staged for commit"
 IGTD_UNTRACKED_RE="Untracked files:"
+IGTD_UNMERGED_RE="Unmerged paths:"
 IGTD_BEHIND_RE="branch is ahead"
 IGTD_AHEAD_RE="branch is behind"
 
@@ -57,6 +58,7 @@ function igtd-git-prompt {
             "$(git rev-parse --short HEAD 2>/dev/null)"
         igtd-git-prompt-check "$git_status" "$IGTD_CLEAN_RE" "$IGTD_CLEAN"
         igtd-git-prompt-check "$git_status" "$IGTD_STAGED_RE" "$IGTD_STAGED"
+        igtd-git-prompt-check "$git_status" "$IGTD_UNMERGED_RE" "$IGTD_UNMERGED"
         igtd-git-prompt-check "$git_status" "$IGTD_UNSTAGED_RE" "$IGTD_UNSTAGED"
         igtd-git-prompt-check "$git_status" "$IGTD_UNTRACKED_RE" "$IGTD_UNTRACKED"
         igtd-git-prompt-check "$git_status" "$IGTD_AHEAD_RE" "$IGTD_AHEAD"
