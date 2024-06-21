@@ -6,5 +6,5 @@ IGTD_VAR_NOTIFY=(
     DDS_ROOT D
     ACE_ROOT A
     TAO_ROOT T
-    NIX_STORE N
+    NIX_STORE '󱄅'
 )

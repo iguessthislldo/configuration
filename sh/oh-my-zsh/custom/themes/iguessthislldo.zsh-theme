@@ -13,16 +13,19 @@ IGTD_ERROR=$'\uf057 ' # circle with x: 
 IGTD_RECURSIVE_SHELL=$'\u042f ' # Cryillic Capital YA: Я
 
 # git ========================================================================
+IGTD_GIT=$'\ue702' # 
 IGTD_BRANCH=$'\ue0a0' # Powerline branch symbol: 
+IGTD_COMMIT=$'\ue729' # 
+IGTD_TAG=$'\uf02b' # 
 
 #TODO: convert symbols below to utf8 hex like above
 IGTD_CLEAN='%K{green}✔ %k'
-IGTD_STAGED='%K{yellow}● %k'
+IGTD_STAGED='%K{yellow}󰋗 %k'
 IGTD_UNMERGED='%K{yellow}✖ %k' #TODO
 IGTD_UNSTAGED='%K{red}✚ %k'
 IGTD_UNTRACKED='%K{red}⎙ %k'
-IGTD_AHEAD=$'%K{blue}\u23ed %k' # ⏭
-IGTD_BEHIND=$'%K{blue}\u23ee %k' # ⏮
+IGTD_AHEAD='%K{blue}  %k'
+IGTD_BEHIND='%K{blue}  %k'
 
 IGTD_CLEAN_RE="nothing to commit, working tree clean"
 IGTD_STAGED_RE="Changes to be committed"
@@ -32,7 +35,7 @@ IGTD_BEHIND_RE="branch is ahead"
 IGTD_AHEAD_RE="branch is behind"
 
 function igtd-git-prompt-check {
-    if echo $1 | grep $2 &> /dev/null
+    if [[ "$1" =~ "$2" ]]
     then
         echo -n $3
     fi
@@ -41,10 +44,17 @@ function igtd-git-prompt-check {
 function igtd-git-prompt {
     if git_status="$(git status 2>/dev/null)"
     then
-        printf ' %s %s (%s) '\
-               "$IGTD_BRANCH"\
-               "$(echo $git_status | sed -n 's/On branch \(.*\)/\1/p')"\
-               "$(git rev-parse --short HEAD 2>/dev/null)"
+        echo -n " $IGTD_GIT "
+        if [[ "$git_status" =~ 'On branch ([[:graph:]]+)' ]]
+        then
+            echo -n "$IGTD_BRANCH${match[1]}"
+        fi
+        if [[ "$git_status" =~ 'HEAD detached at ([[:graph:]]+)' ]]
+        then
+            echo -n "$IGTD_TAG ${match[1]}"
+        fi
+        printf " $IGTD_COMMIT %s " \
+            "$(git rev-parse --short HEAD 2>/dev/null)"
         igtd-git-prompt-check "$git_status" "$IGTD_CLEAN_RE" "$IGTD_CLEAN"
         igtd-git-prompt-check "$git_status" "$IGTD_STAGED_RE" "$IGTD_STAGED"
         igtd-git-prompt-check "$git_status" "$IGTD_UNSTAGED_RE" "$IGTD_UNSTAGED"
