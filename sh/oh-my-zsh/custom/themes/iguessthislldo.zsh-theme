@@ -126,7 +126,7 @@ function igtd-cmd-status {
 function prompt_top {
     if [ ! -z ${SSH_CLIENT+x} ]
     then
-        segment blue '%n @ %M'
+        segment blue '󰣀 %n @ %M'
     fi
 
     if [ ! -z ${IGTD_ENV_NAME+x} ]
