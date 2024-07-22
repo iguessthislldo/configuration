@@ -1,0 +1,26 @@
+set history save on
+
+set print static-members off
+set print pretty on
+set print elements 100
+
+# Load Python files in gdb dir
+python
+import os
+from pathlib import Path
+
+_data_dir = os.environ.get('DATA', None)
+if _data_dir:
+    _cfg_dir = Path(_data_dir) / 'configuration'
+else:
+    _cfg_dir = os.environ.get('XDG_CONFIG_HOME', None)
+if _cfg_dir:
+    _gdb_dir = _cfg_dir / 'gdb'
+    if _gdb_dir.is_dir():
+        for _py_file in sorted(_gdb_dir.glob('**/*.py')):
+            print(_py_file)
+            gdb.execute('source {}'.format(_py_file))
+    else:
+        print('{} does not exist'.format(_gdb_dir))
+else:
+    print('Failed to get gdb config dir path')

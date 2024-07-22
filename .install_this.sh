@@ -14,6 +14,8 @@ InstallLink vim .config/nvim
 
 InstallLink tmux .tmux.conf
 
+InstallLink gdb .config/gdb
+
 InstallLink user-dirs.dir .config/user-dirs.dirs
 
 Scan
