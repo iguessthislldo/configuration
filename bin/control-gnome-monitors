@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+
+import sys
+import time
+import argparse
+
+import dbus
+
+
+def header(level, *args, sep=' ', l=80):
+    fill = ['=', '-', '.'][level]
+    title = sep.join(args)
+    print(title, fill * (l - 1 - len(title)))
+
+
+def get_prop(props, name, default):
+    return type(default)(props[name]) if name in props else default
+
+
+class Mode:
+    def __init__(self, mode_id, w, h, refresh, preferred_scale, supported_scales):
+        self.mode_id = str(mode_id)
+        self.w = str(w)
+        self.h = str(h)
+        self.refresh = float(refresh)
+        self.preferred_scale = float(preferred_scale)
+        self.supported_scales = [float(s) for s in supported_scales]
+
+    def __str__(self):
+        return f'{self.w}x{self.h}@{self.refresh}'
+
+
+class Monitor:
+    def __init__(self, connector, vendor, product, serial, modes, current_mode_id, preferred_mode_id):
+        self.connector = str(connector)
+        self.vendor = str(vendor)
+        self.product = str(product)
+        self.serial = str(serial)
+        self.modes = modes
+        self.current_mode = self.modes[str(current_mode_id)]
+        self.preferred_mode = self.modes[str(preferred_mode_id)]
+
+    def __str__(self):
+        return f'{self.connector} ({self.current_mode})'
+
+
+class LogicalMonitor:
+    transform_values = [('up', 0, 4), ('down', 2, 6), ('left', 3, 7), ('right', 1, 5)]
+
+    def __init__(self, x, y, scale, transform, is_primary, all_monitors, on_monitors):
+        self.x = int(x)
+        self.y = int(y)
+        self.scale = float(scale)
+        self.transform = int(transform)
+        self.is_primary = bool(is_primary)
+        self.on_monitors = []
+        for connector, *_ in on_monitors:
+            self.on_monitors.append(all_monitors[str(connector)])
+
+    def set_transform(self, set_name, set_flipped):
+        for name, normal, flipped in self.transform_values:
+            if name == set_name:
+                self.transform = flipped if set_flipped else normal
+                return False
+        return True
+
+    @property
+    def rotate(self):
+        for name, normal, flipped in self.transform_values:
+            if self.transform in (normal, flipped):
+                return name
+        raise ValueError(f'{self.transform} is invalid')
+
+    @rotate.setter
+    def rotate(self, value):
+        if self.set_transform(value, self.flip):
+            raise ValueError(f'{value} is invalid')
+
+    @property
+    def flip(self):
+        for name, normal, flipped in self.transform_values:
+            if self.transform == normal:
+                return False
+            elif self.transform == flipped:
+                return True
+        raise ValueError(f'{self.transform} is invalid')
+
+    @flip.setter
+    def flip(self, value):
+        if self.set_transform(self.rotate, value):
+            raise ValueError(f'{value} is invalid')
+
+    def __str__(self):
+        primary = 'PRIMARY ' if self.is_primary else ''
+        monitors = ', '.join([str(m) for m in self.on_monitors])
+        flipped = 'FLIPPED ' if self.flip else ''
+        return f'{self.x}, {self.y} {primary}{self.rotate} {flipped}scaled {self.scale} {self.transform} on {monitors}'
+
+
+
+class DisplayConfig:
+    def __init__(self):
+        self.bus = dbus.SessionBus()
+        self.dc_name = 'org.gnome.Mutter.DisplayConfig'
+        self.dc_obj = self.bus.get_object(self.dc_name, '/org/gnome/Mutter/DisplayConfig')
+        self.dc_interfaces = dbus.Interface(self.dc_obj, dbus_interface=self.dc_name)
+
+    def get(self):
+        cfg_serial, got_monitors, got_logical_monitors, *_ = self.dc_interfaces.GetCurrentState()
+
+        monitors = {}
+        for info, got_modes, *_ in got_monitors:
+            connector, vendor, product, serial, *_ = info
+            modes = {}
+            current_mode_id = None
+            preferred_mode_id = None
+            for mode_id, w, h, refresh, preferred_scale, supported_scales, props, *_ in got_modes:
+                modes[mode_id] = Mode(mode_id, w, h, refresh, preferred_scale, supported_scales)
+                if get_prop(props, 'is-current', False):
+                    current_mode_id = mode_id
+                if get_prop(props, 'is-preferred', False):
+                    preferred_mode_id = mode_id
+            monitors[connector] = Monitor(
+                connector, vendor, product, serial, modes, current_mode_id, preferred_mode_id)
+
+        logical_monitors = []
+        for x, y, scale, transform, is_primary, on_monitors, *_ in got_logical_monitors:
+            logical_monitors.append(LogicalMonitor(
+                x, y, scale, transform, is_primary, monitors, on_monitors))
+
+        return cfg_serial, monitors, logical_monitors
+
+    def set(self, cfg_serial, logical_monitors, tmp=True):
+        apply_logical_monitors = []
+        for lm in logical_monitors:
+            apply_on_monitors = []
+            for m in lm.on_monitors:
+                apply_on_monitors.append([m.connector, m.current_mode.mode_id, {}])
+            apply_logical_monitors.append([
+                lm.x, lm.y, lm.scale, lm.transform, lm.is_primary, apply_on_monitors])
+        self.dc_interfaces.ApplyMonitorsConfig(
+            cfg_serial, 1 if tmp else 2, apply_logical_monitors, {})
+
+
+class Desktop:
+    def __init__(self):
+        self.dc = DisplayConfig()
+        self.cfg_serial = None
+        self.monitors = None
+        self.logical_monitors = None
+        self.natural_logical_monitors = None
+
+    def get(self):
+        self.cfg_serial, self.monitors, self.logical_monitors = self.dc.get()
+        self.natural_logical_monitors = []
+        for lm in self.logical_monitors:
+            if lm.is_primary:
+                self.natural_logical_monitors = [lm] + self.natural_logical_monitors
+            else:
+                self.natural_logical_monitors.append(lm)
+
+    def set(self):
+        self.dc.set(self.cfg_serial, self.logical_monitors)
+
+    def dump_monitors(self):
+        header(0, 'Monitors')
+        for monitor in self.monitors.values():
+            print(monitor)
+
+    def dump_logical_monitors(self, title='Current'):
+        header(0, title)
+        for logical_monitor in self.natural_logical_monitors:
+            print(logical_monitor)
+
+    def logical_monitor_on(self, connector):
+        for logical_monitor in self.logical_monitors:
+            for monitor in logical_monitor.on_monitors:
+                if monitor.connector == connector:
+                    return logical_monitor
+        raise ValueError(f'Could not find logical monitor on {connector}')
+
+
+if __name__ == '__main__':
+    desktop = Desktop()
+    desktop.get()
+    desktop.dump_monitors()
+    desktop.dump_logical_monitors()
+
+    rotate_opts = ['--' + values[0] for values in LogicalMonitor.transform_values]
+    changed = False
+    arg_count = len(sys.argv)
+    lm = None
+    i = 1
+    while i < arg_count:
+        opt = sys.argv[i]
+        print(i, opt)
+        if opt == '-d' or opt == '--display':
+            i += 1
+            lm = desktop.natural_logical_monitors[int(sys.argv[i])]
+        elif opt in rotate_opts:
+            if lm is None:
+                sys.exit('Missing --display DISPLAY')
+            lm.rotate = opt[2:]
+            changed = True
+        else:
+            sys.exit(f'Unknown option: {opt}')
+        i += 1
+
+    if changed:
+        desktop.dump_logical_monitors('Changed')
+        desktop.set()
