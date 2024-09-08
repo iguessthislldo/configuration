@@ -1,40 +1,67 @@
 #!/usr/bin/env python3
-import subprocess
-import sys
 
-def add_shortcut(name, command, binding):
-    # defining keys & strings to be used
-    key = "org.gnome.settings-daemon.plugins.media-keys custom-keybindings"
-    subkey1 = key.replace(" ", ".")[:-1]+":"
-    item_s = "/"+key.replace(" ", "/").replace(".", "/")+"/"
-    firstname = "custom"
-    # get the current list of custom shortcuts
-    get = lambda cmd: subprocess.check_output(["/bin/bash", "-c", cmd]).decode("utf-8")
-    array_str = get("gsettings get "+key)
-    # in case the array was empty, remove the annotation hints
-    command_result = array_str.lstrip("@as")
-    current = eval(command_result)
-    # make sure the additional keybinding mention is no duplicate
-    n = 1
+import sys
+import subprocess
+import json
+
+
+keys_schema = ('org', 'gnome', 'settings-daemon', 'plugins', 'media-keys')
+keybinding = 'custom-keybinding'
+keybindings = keybinding + 's'
+def shortcut_cmd(key, extra_schema=None, path='', value=None):
+    cmd = ['gsettings', 'get' if value is None else 'set']
+    schema = keys_schema
+    if extra_schema:
+        schema += extra_schema
+    schema = '.'.join(schema)
+    if path:
+        schema += ':' + path
+    cmd.extend([schema, key])
+    if value is not None:
+        cmd.append(json.dumps(value))
+    print(' '.join(cmd))
+    if value is None:
+        return json.loads(subprocess.check_output(cmd)
+            .decode('utf-8').strip().removeprefix('@as ').replace("'", '"'))
+    return subprocess.check_call(cmd)
+
+
+def add_shortcut(name, desc, binding, command):
+    binding = ''.join(binding)
+    shortcuts = shortcut_cmd(keybindings)
+    for shortcut in shortcuts:
+        other_binding = shortcut_cmd('binding', (keybinding,), shortcut)
+        if binding == other_binding:
+            other_desc = shortcut_cmd('name', (keybinding,), shortcut)
+            sys.exit(f'"{desc}" conflicts with with existing "{other_desc}": {binding}')
+    n = 0
     while True:
-        new = item_s+firstname+str(n)+"/"
-        if new in current:
-            n = n+1
+        path = '/' + '/'.join(keys_schema + (keybindings, f'custom{n}')) + '/'
+        if path in shortcuts:
+            n += 1
         else:
             break
-    # add the new keybinding to the list
-    current.append(new)
-    # create the shortcut, set the name, command and shortcut key
-    cmd0 = 'gsettings set '+key+' "'+str(current)+'"'
-    cmd1 = 'gsettings set '+subkey1+new+" name '"+name+"'"
-    cmd2 = 'gsettings set '+subkey1+new+" command '"+command+"'"
-    cmd3 = 'gsettings set '+subkey1+new+" binding '"+binding+"'"
+    print(path)
+    if path not in shortcuts:
+        shortcuts.append(path)
+        shortcut_cmd(keybindings, value=shortcuts)
+    shortcut_cmd('name', (keybinding,), path, desc)
+    shortcut_cmd('binding', (keybinding,), path, binding)
+    shortcut_cmd('command', (keybinding,), path, command)
 
-    for cmd in [cmd0, cmd1, cmd2, cmd3]:
-        subprocess.call(["/bin/bash", "-c", cmd])
 
-m = 'Rotate second display '
-c = '/data/configuration/bin/control-gnome-monitors --display 1 --'
-b = '<Primary><Alt><Super>'
-for m_end, rotate in (('up', 'up'), ('down', 'down'), ('to the right', 'right'), ('to the left', 'left')):
-    add_shortcut(m + m_end, c + rotate, b + rotate.capitalize())
+ctrl_key = '<Primary>'
+alt_key = '<Alt>'
+super_key = '<Super>'
+
+
+rotate_shortcuts = (
+    ('up', 'up'),
+    ('down', 'down'),
+    ('right', 'to the right'),
+    ('left', 'to the left'),
+)
+for name, desc in rotate_shortcuts:
+    add_shortcut(f'rotate-{name}', f'Rotate second display {desc}',
+        [ctrl_key, alt_key, super_key, name.capitalize()],
+        f'/data/configuration/bin/control-gnome-monitors --display 1 --{name}')
