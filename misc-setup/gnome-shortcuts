@@ -26,13 +26,16 @@ def shortcut_cmd(key, extra_schema=None, path='', value=None):
     return subprocess.check_call(cmd)
 
 
-def add_shortcut(name, desc, binding, command):
+def add_shortcut(desc, binding, command):
     binding = ''.join(binding)
     shortcuts = shortcut_cmd(keybindings)
     for shortcut in shortcuts:
         other_binding = shortcut_cmd('binding', (keybinding,), shortcut)
         if binding == other_binding:
             other_desc = shortcut_cmd('name', (keybinding,), shortcut)
+            other_command = shortcut_cmd('command', (keybinding,), shortcut)
+            if desc == other_desc and command == other_command:
+                return
             sys.exit(f'"{desc}" conflicts with with existing "{other_desc}": {binding}')
     n = 0
     while True:
@@ -55,6 +58,9 @@ alt_key = '<Alt>'
 super_key = '<Super>'
 
 
+cgd = '/data/configuration/bin/control-gnome-displays'
+keys = [ctrl_key, alt_key, super_key]
+
 rotate_shortcuts = (
     ('up', 'up'),
     ('down', 'down'),
@@ -62,6 +68,8 @@ rotate_shortcuts = (
     ('left', 'to the left'),
 )
 for name, desc in rotate_shortcuts:
-    add_shortcut(f'rotate-{name}', f'Rotate second display {desc}',
-        [ctrl_key, alt_key, super_key, name.capitalize()],
-        f'/data/configuration/bin/control-gnome-monitors --display 1 --{name}')
+    add_shortcut(f'Rotate second display {desc}',
+        keys + [name.capitalize()], f'{cgd} --display 1 --{name}')
+
+add_shortcut('Restore main display',
+    keys + ['r'], f'{cgd} --display 0 --load normal --permanent')
