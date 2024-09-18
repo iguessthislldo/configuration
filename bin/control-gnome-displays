@@ -6,13 +6,16 @@ import argparse
 import json
 import dataclasses
 import typing
+import math
 from inspect import signature, ismethod
 from pathlib import Path
 
 import dbus
 
+term_width = 80
 
-def header(level, *args, sep=' ', l=80):
+
+def header(level, *args, sep=' ', l=term_width):
     fill = ['=', '-', '.'][level]
     title = sep.join(args)
     print(title, fill * (l - 1 - len(title)))
@@ -87,6 +90,127 @@ def to_json(obj, **kw):
     return json.dumps(obj, cls=OurJsonEncoder, **kw)
 
 
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __add__(self, other):
+        return Point(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        return Point(self.x - other.x, self.y - other.y)
+
+    def __mul__(self, other):
+        return Point(self.x * other.x, self.y * other.y)
+
+    def __truediv__(self, other):
+        if type(other) is Point:
+            return Point(self.x / other.x, self.y / other.y)
+        return Point(self.x / other, self.y / other)
+
+    def __floor__(self):
+        return Point(math.floor(self.x), math.floor(self.y))
+
+    def only_x(self, alt=0):
+        return Point(self.x + alt, 0)
+
+    def only_y(self, alt=0):
+        return Point(0, self.y + alt)
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __str__(self):
+        return f'{self.x}, {self.y}'
+
+    def __repr__(self):
+        return f'<{self}>'
+
+
+class Space:
+    def __init__(self):
+        self.max_p = Point(float('-inf'), float('-inf'))
+        self.min_p = Point(float('inf'), float('inf'))
+
+    def size(self):
+        return self.max_p - self.min_p
+
+    def rect(self, pos, size):
+        self.min_p = Point(min(self.min_p.x, pos.x), min(self.min_p.y, pos.y))
+        max_p = pos + size
+        self.max_p = Point(max(self.max_p.x, max_p.x), max(self.max_p.y, max_p.y))
+
+
+class Draw(Space):
+    def __init__(self):
+        self.rects = []
+        super().__init__()
+
+    def rect(self, pos, size, text='', corner='+', vert='|', horz='-'):
+        super().rect(pos, size)
+        self.rects.append((pos, size, text, corner, vert, horz))
+
+    def render_point(self, points, clip, point, char):
+        assert len(char) == 1
+        p = point - clip
+        points[p.y][p.x] = char
+
+    def render_horz_line(self, points, clip, a, b, char):
+        for x in range(a.x, b.x):
+            self.render_point(points, clip, Point(x, a.y), char)
+
+    def render_vert_line(self, points, clip, a, b, char):
+        for y in range(a.y, b.y):
+            self.render_point(points, clip, Point(a.x, y), char)
+
+    def scale_point(self, p, scale):
+        return math.floor(p * Point(scale, scale * 0.50))
+
+    def render_rect(self, points, clip, scale, pos, size, text, corner, vert, horz):
+        pos = self.scale_point(pos, scale)
+        size = self.scale_point(size, scale)
+        xoff = Point(1, 0)
+        yoff = Point(0, 1)
+        size -= xoff + yoff
+        if size.x < 0 or size.y < 0:
+            return False
+
+        # a>b
+        # V V
+        # c>d
+        a = pos
+        b = pos + size.only_x()
+        c = pos + size.only_y()
+        d = pos + size
+        self.render_point(points, clip, a, corner)
+        self.render_point(points, clip, b, corner)
+        self.render_point(points, clip, c, corner)
+        self.render_point(points, clip, d, corner)
+        self.render_horz_line(points, clip, a + xoff, b, horz)
+        self.render_horz_line(points, clip, c + xoff, d, horz)
+        self.render_vert_line(points, clip, a + yoff, c, vert)
+        self.render_vert_line(points, clip, b + yoff, d, vert)
+
+        for n, c in enumerate(text):
+            self.render_point(points, clip, pos + Point(1 + n, 1), c)
+
+        return True
+
+    def render_at(self, scale):
+        size = self.scale_point(self.size(), scale)
+        points = [[' ' for _ in range(size.x + 1)] for _ in range(size.y + 1)]
+        clip = self.scale_point(self.min_p, scale)
+        for rect in self.rects:
+            self.render_rect(points, clip, scale, *rect)
+        for row in points:
+            print(''.join(row))
+
+    def render(self, col_width):
+        s = col_width / self.size().x
+        self.render_at(s)
+
+
 @dataclasses.dataclass
 class Mode(DataClassHelper):
     mode_id: str
@@ -95,6 +219,9 @@ class Mode(DataClassHelper):
     refresh: float
     preferred_scale: float
     supported_scales: list[float]
+
+    def size(self):
+        return Point(self.w, self.h)
 
     def __str__(self):
         return f'{self.w}x{self.h}@{self.refresh:.5}'
@@ -127,6 +254,9 @@ class Monitor(MonitorUniqueId):
     def preferred_mode(self):
         return self.modes[self.preferred_mode_id]
 
+    def get_size(self):
+        return self.current_mode().size()
+
     def __str__(self):
         mode = self.current_mode()
         return f'{self.connector} {mode}'
@@ -154,6 +284,29 @@ class Display(DataClassHelper):
     transform: int
     is_primary: bool
     on_monitors: list[str]
+
+    @property
+    def pos(self):
+        return Point(self.x, self.y)
+
+    @pos.setter
+    def pos(self, value):
+        self.x = value.x
+        self.y = value.y
+
+    def get_size(self, all_monitors):
+        if len(self.on_monitors) == 0:
+            raise ValueError('There are no monitors on this display')
+        on_monitors = [all_monitors[m] for m in self.on_monitors]
+        first = on_monitors[0].get_size()
+        if not all([m.get_size() == first for m in on_monitors]):
+            raise ValueError('Not all the monitors on this display are not the same size?')
+        if self.rotate in ('left', 'right'):
+            first = Point(first.y, first.x)
+        return first
+
+    def get_effective_size(self, all_monitors):
+        return self.get_size(all_monitors) / Point(self.scale, self.scale)
 
     def _set_transform(self, set_name, set_flipped):
         for name, normal, flipped in self.transform_values:
@@ -396,6 +549,12 @@ class Desktop:
         for i, display in enumerate(self.natural_displays):
             display.print_listing(i, self.monitors)
 
+    def draw(self):
+        draw = Draw()
+        for n, display in enumerate(self.natural_displays):
+            draw.rect(display.pos, display.get_effective_size(self.monitors), str(n))
+        draw.render(int(term_width * 0.75))
+
     def save_dp(self, dp, name):
         self.config.displays[name] = \
             SavedDisplay.from_display(self.monitors, dp)
@@ -464,14 +623,17 @@ class Cli:
     def set_verbose(self):
         self.desktop.verbose = True
 
-    def set_display(self, index_or_connector):
+    def get_display(self, index_or_connector):
         if index_or_connector in self.desktop.displays_by_connector:
-            self.dp = self.desktop.displays_by_connector[index_or_connector]
+            return self.desktop.displays_by_connector[index_or_connector]
         else:
             try:
-                self.dp = self.desktop.natural_displays[int(index_or_connector)]
+                return self.desktop.natural_displays[int(index_or_connector)]
             except:
                 raise RuntimeError(f'{repr(index_or_connector)} is not a valid display index or connector')
+
+    def set_display(self, index_or_connector):
+        self.dp = self.get_display(index_or_connector)
 
     def requires_display(self):
         if self.dp is None:
@@ -508,14 +670,15 @@ class Cli:
 
 if __name__ == '__main__':
     desktop = Desktop()
+    desktop.list('Current')
+    desktop.draw()
 
     cli = Cli(desktop)
     args = cli.parse()
 
-    desktop.list('Current')
-
-    if desktop.display_data_changed():
+    if desktop.display_data_changed() or args.permanent:
         desktop.list(title='Changed')
+        desktop.draw()
         desktop.save_display_data(args.permanent, args.dry_run)
     else:
         print('Unchanged')
