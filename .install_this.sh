@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if ! $complete_install
+then
+    cp sh/rc.sh $HOME/.zshrc
+    cp sh/env.sh $HOME/.zshenv
+    return
+fi
+
 InstallLink cfg
 
 # zsh

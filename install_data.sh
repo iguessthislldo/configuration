@@ -12,11 +12,24 @@ export_path="$(realpath -s "$install_cfg/$export_file")"
 doing_export=false
 doing_install=false
 
-if [ -z ${XDG_CONFIG_HOME+x} ]
+if [ -z ${complete_install+x} ]
 then
-    export XDG_CONFIG_HOME="$HOME/.config"
+    if [ -z ${MINGW_CHOST+x} ]
+    then
+        export complete_install=true
+    else
+        export complete_install=false
+    fi
 fi
-mkdir -p "$XDG_CONFIG_HOME"
+
+if $complete_install
+then
+    if [ -z ${XDG_CONFIG_HOME+x} ]
+    then
+        export XDG_CONFIG_HOME="$HOME/.config"
+    fi
+    mkdir -p "$XDG_CONFIG_HOME"
+fi
 
 function paths_are_same {
     a=$(readlink -f $1)
@@ -109,37 +122,44 @@ function action_install {
 
     doing_install=true
     cd $install_data
-    InstallLink dat
 
-    InstallDir bin
+    if $complete_install
+    then
+        InstallLink dat
 
-    mkdir -p downloads
-    InstallLink downloads dl
-    mkdir -p documents
-    InstallLink documents docs
-    mkdir -p music
-    InstallLink music music
-    mkdir -p pictures
-    InstallLink pictures pics
-    mkdir -p videos
-    InstallLink videos vids
-    mkdir -p src
-    InstallLink src src
-    mkdir -p dev
-    InstallLink dev dev
-    mkdir -p work
-    InstallLink work work
+        InstallDir bin
+
+        mkdir -p downloads
+        InstallLink downloads dl
+        mkdir -p documents
+        InstallLink documents docs
+        mkdir -p music
+        InstallLink music music
+        mkdir -p pictures
+        InstallLink pictures pics
+        mkdir -p videos
+        InstallLink videos vids
+        mkdir -p src
+        InstallLink src src
+        mkdir -p dev
+        InstallLink dev dev
+        mkdir -p work
+        InstallLink work work
+    fi
 
     Scan
 
-    cd $install_cfg
-    echo 'Making sure git origin is SSH'
-    origin='git@github.com:iguessthislldo/configuration.git'
-    if [ "$(git remote get-url origin)" != "$origin" ]
+    if $complete_install
     then
-        git remote set-url origin $origin
-    else
-        echo "Already set to $origin"
+        cd $install_cfg
+        echo 'Making sure git origin is SSH'
+        origin='git@github.com:iguessthislldo/configuration.git'
+        if [ "$(git remote get-url origin)" != "$origin" ]
+        then
+            git remote set-url origin $origin
+        else
+            echo "Already set to $origin"
+        fi
     fi
 }
 
