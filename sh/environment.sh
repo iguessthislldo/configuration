@@ -15,6 +15,16 @@ else
     export IS_BASH=true
 fi
 
+if [ -z ${IGTD_IS_MINGW+x} ]
+then
+    if [ -z ${MINGW_CHOST+x} ]
+    then
+        export IGTD_IS_MINGW=false
+    else
+        export IGTD_IS_MINGW=true
+    fi
+fi
+
 if [ -f $CONFIG/machine_id.local.sh ]
 then
     source $CONFIG/machine_id.local.sh
