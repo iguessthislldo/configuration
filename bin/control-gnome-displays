@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# https://gitlab.gnome.org/GNOME/mutter/-/blob/gnome-42/data/dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml
+
 import sys
 import time
 import argparse
@@ -7,12 +9,14 @@ import json
 import dataclasses
 import typing
 import math
+import itertools
 from inspect import signature, ismethod
 from pathlib import Path
 
 import dbus
 
 term_width = 80
+draw_width = int(term_width * 0.75)
 
 
 def header(level, *args, sep=' ', l=term_width):
@@ -132,24 +136,47 @@ class Space:
     def __init__(self):
         self.max_p = Point(float('-inf'), float('-inf'))
         self.min_p = Point(float('inf'), float('inf'))
+        self.rects = []
 
     def size(self):
         return self.max_p - self.min_p
 
-    def rect(self, pos, size):
-        self.min_p = Point(min(self.min_p.x, pos.x), min(self.min_p.y, pos.y))
-        max_p = pos + size
+    def update_extremes(self, min_p, max_p, *args):
+        self.min_p = Point(min(self.min_p.x, min_p.x), min(self.min_p.y, min_p.y))
         self.max_p = Point(max(self.max_p.x, max_p.x), max(self.max_p.y, max_p.y))
+
+    def rect(self, pos, size, name, *args):
+        self.update_extremes(pos, pos + size)
+        self.rects.append((pos, size, name, *args))
+
+    @staticmethod
+    def interaction(s1, l1, s2, l2):
+        e1 = s1 + l1
+        e2 = s2 + l2
+        return ((e1 > s2 and e2 > s1), (e1 == s2 or e2 == s1))
+
+    def rect_interaction(self):
+        overlapping = []
+        touching = {}
+        for rect in self.rects:
+            touching[rect] = {rect}
+        for r1, r2 in itertools.combinations(self.rects, r=2):
+            pos1, size1, name1, *_ = r1
+            pos2, size2, name2, *_ = r2
+            x_overlaps, x_touches = self.interaction(pos1.x, size1.x, pos2.x, size2.x)
+            y_overlaps, y_touches = self.interaction(pos1.y, size1.y, pos2.y, size2.y)
+            if x_overlaps or y_overlaps:
+                overlapping.append((r1.name, r2.name))
+            if x_touches or y_touches:
+                t1 = touching[name1]
+                t2 = touching[name2]
+                t1 |= t2
+        return overlapping
 
 
 class Draw(Space):
-    def __init__(self):
-        self.rects = []
-        super().__init__()
-
-    def rect(self, pos, size, text='', corner='+', vert='|', horz='-'):
-        super().rect(pos, size)
-        self.rects.append((pos, size, text, corner, vert, horz))
+    def rect(self, pos, size, name, text='', corner='+', vert='|', horz='-'):
+        super().rect(pos, size, name, text, corner, vert, horz)
 
     def render_point(self, points, clip, point, char):
         assert len(char) == 1
@@ -167,9 +194,11 @@ class Draw(Space):
     def scale_point(self, p, scale):
         return math.floor(p * Point(scale, scale * 0.50))
 
-    def render_rect(self, points, clip, scale, pos, size, text, corner, vert, horz):
+    def render_rect(self, points, clip, scale, pos, size, name, text, corner, vert, horz):
         pos = self.scale_point(pos, scale)
         size = self.scale_point(size, scale)
+
+        # Shorten the lines for the corner pieces
         xoff = Point(1, 0)
         yoff = Point(0, 1)
         size -= xoff + yoff
@@ -276,7 +305,12 @@ class SavedMonitor(MonitorUniqueId):
 
 @dataclasses.dataclass
 class Display(DataClassHelper):
-    transform_values: typing.ClassVar = [('up', 2, 6), ('down', 0, 4), ('left', 3, 7), ('right', 1, 5)]
+    transform_values: typing.ClassVar = [
+        ('up', 0, 4),
+        ('down', 2, 6),
+        ('left', 3, 7),
+        ('right', 1, 5)
+    ]
 
     x: int
     y: int
@@ -552,8 +586,14 @@ class Desktop:
     def draw(self):
         draw = Draw()
         for n, display in enumerate(self.natural_displays):
-            draw.rect(display.pos, display.get_effective_size(self.monitors), str(n))
-        draw.render(int(term_width * 0.75))
+            d = {
+                'up': '↑',
+                'down': '↓',
+                'left': '←',
+                'right': '→',
+            }[display.rotate]
+            draw.rect(display.pos, display.get_effective_size(self.monitors), f'{n}', f'{n}{d}')
+        draw.render(draw_width)
 
     def save_dp(self, dp, name):
         self.config.displays[name] = \
@@ -594,6 +634,22 @@ class FuncAction(argparse.Action):
         except RuntimeError as e:
             raise argparse.ArgumentError(self, e)
 
+    @classmethod
+    def add_func_arg(cls, arg_parser, func, *args, dest=None, fixed_args=None, **kw):
+        sig = signature(func)
+        params = func.__code__.co_varnames
+        if ismethod(func):
+            params = params[1:]
+        if sig.return_annotation is sig.empty and dest is None:
+            dest = argparse.SUPPRESS
+        arg_parser.add_argument(*args, dest=dest,
+            action=type(f'{func.__name__}Action', (cls,), {
+                'func': func,
+                'params': params,
+                'fixed_args': fixed_args,
+            }),
+            **kw)
+
 
 class Cli:
     def __init__(self, desktop):
@@ -608,7 +664,7 @@ class Cli:
             help='Set display to modify in following commands')
         for name in [values[0] for values in Display.transform_values]:
             self.add_func_arg(self.set_rotation, f'--{name}', fixed_args=(name,),
-                help=f'Rotate display so the bottom is {name} relative to the monitor')
+                help=f'Rotate display so the top is {name} relative to the monitor')
         self.add_func_arg(self.save_dp, '--save', help='Save the display settings under a name')
         self.add_func_arg(self.load_dp, '--load', help='Load the display settings from a name')
         self.parser.add_argument('--dry-run', action='store_true', help='Do not change anything')
@@ -650,19 +706,7 @@ class Cli:
         self.desktop.load_dp(self.requires_display(), name)
 
     def add_func_arg(self, func, *args, dest=None, fixed_args=None, **kw):
-        sig = signature(func)
-        params = func.__code__.co_varnames
-        if ismethod(func):
-            params = params[1:]
-        if sig.return_annotation is sig.empty and dest is None:
-            dest = argparse.SUPPRESS
-        self.parser.add_argument(*args, dest=dest,
-            action=type(f'{func.__name__}Action', (FuncAction,), {
-                'func': func,
-                'params': params,
-                'fixed_args': fixed_args,
-            }),
-            **kw)
+        FuncAction.add_func_arg(self.parser, func, *args, dest=dest, fixed_args=fixed_args, **kw)
 
     def parse(self):
         return self.parser.parse_args()
