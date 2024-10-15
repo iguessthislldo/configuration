@@ -21,7 +21,19 @@ then
 fi
 if [ -z ${IGTD_MACHINE_ID+x} ]
 then
-    export IGTD_MACHINE_ID=$(cat /etc/machine-id)
+    if [ -f /etc/machine-id ]
+    then
+        export IGTD_MACHINE_ID=$(cat /etc/machine-id)
+    elif [ -n "${HOST}" ]
+    then
+        export IGTD_MACHINE_ID="${HOST}"
+    elif [ -n "${HOSTNAME}" ]
+    then
+        export IGTD_MACHINE_ID="${HOSTNAME}"
+    else
+        export IGTD_MACHINE_ID="unknown"
+        echo "Couldn't get something for IGTD_MACHINE_ID, using \"$IGTD_MACHINE_ID\""
+    fi
 fi
 
 function igtd_add_to_path {
