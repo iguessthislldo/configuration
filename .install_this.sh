@@ -9,6 +9,9 @@ fi
 
 InstallLink cfg
 
+# Flox
+InstallLink flox .flox
+
 # zsh
 InstallLink sh/rc.sh .zshrc
 InstallLink sh/environment.sh .zshenv
