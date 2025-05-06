@@ -4,7 +4,7 @@ My framework for my configuration/dot files.
 
 ## Setup
 
-- Install [Nix](https://nix.dev/install-nix#install-nix)
+- Install [Flox](https://flox.dev/docs/install-flox/)
 - Make sure these programs are installed:
     - Zsh
     - GnuPG
@@ -12,15 +12,20 @@ My framework for my configuration/dot files.
     - git
     - Ex: `sudo apt install zsh gnupg xclip git`
 - Create a `/data` directory (TODO: Ability to have it somewhere else?)
+    - `cd /`
     - `sudo mkdir /data`
     - `sudo chown $USER:$USER /data`
 - Place/clone this repository at `/data/configuration`.
-    - `git clone https://github.com/iguessthislldo/configuration`
-- `nix-env -if default.nix` (TODO: use better way to do this)
-- `git submodule init && git submodule update`
+    - `cd /data`
+    - `git clone --recurse-submodules https://github.com/iguessthislldo/configuration`
+    - `cd configuration`
 - `bash install_data.sh` to do the initial setup, clearing existing default
   stuff in the home directory and repeating the command as necessary until
   it's able to finish.
+    - If the destination system is running a SSH server you're using to do
+      this, it could make new logins impossible:
+      (`Permission denied (publickey)`) because the `.ssh` directory was
+      replaced with a symlink.
 - Set Zsh as the default shell, for example: `chsh -s /usr/bin/zsh`
 - At this point now or later we can either run `zsh` manually or relogin to
   have it take its place as the default shell.
