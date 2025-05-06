@@ -76,6 +76,11 @@ function InstallLink {
             if ask "Remove existing $link" ; then
                 rm -fr "$link"
             else
+                if ask "Skip installing $link" ; then
+                    echo "Skipped"
+                    return 0
+                fi
+                echo "Error: alright, can't continue" 1>&2
                 exit 1
             fi
         else
