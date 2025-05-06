@@ -22,10 +22,6 @@ My framework for my configuration/dot files.
 - `bash install_data.sh` to do the initial setup, clearing existing default
   stuff in the home directory and repeating the command as necessary until
   it's able to finish.
-    - If the destination system is running a SSH server you're using to do
-      this, it could make new logins impossible:
-      (`Permission denied (publickey)`) because the `.ssh` directory was
-      replaced with a symlink.
 - Set Zsh as the default shell, for example: `chsh -s /usr/bin/zsh`
 - At this point now or later we can either run `zsh` manually or relogin to
   have it take its place as the default shell.
@@ -44,7 +40,18 @@ My framework for my configuration/dot files.
       files.
 - Set terminal font if desired.
 - Run `(cd ~/cfg/git && bash setup.sh)` to setup Git.
-- Run scripts in `misc-setup` as needed.
+
+### Rest of Setup
+
+Run scripts in `misc-setup` as needed.
+
+- If the destination system is running a SSH server you're using to do this, it
+  could make new logins impossible: (`Permission denied (publickey)`) because
+  the `.ssh` directory was replaced with a symlink. `.ssh` has to stay a normal
+  directory: Run `$CONFIG/misc-setup/copy-ssh.sh` to copy everything and make
+  sure the permissions are good.
+- Run `$CONFIG/misc-setup/exclusive-perms.sh $CONFIG/gnupg` if gnupg has
+  problems signing git commits.
 
 ## Directory Structure
 
