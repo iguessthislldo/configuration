@@ -1,4 +1,4 @@
-" -------------------- Plugins --------------------
+" Plugins ====================================================================
 
 " Download vim-plug if it's not there
 " Based on https://github.com/junegunn/vim-plug/wiki/tips#automatic-installation
@@ -24,10 +24,11 @@ Plug 'airblade/vim-gitgutter'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'ziglang/zig.vim'
 Plug 'nvie/vim-flake8'
-Plug 'neovim/nvim-lspconfig'
+" Plug 'neovim/nvim-lspconfig'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'habamax/vim-rst'
+Plug 'scottmckendry/cyberdream.nvim'
 
 " Use local copy of vim-opendds, else download it
 if isdirectory(expand('$LOCAL_VIM_OPENDDS'))
@@ -40,28 +41,58 @@ call plug#end()
 
 set completeopt=menu,menuone,noselect
 
-" -------------------- Plugins Settings --------------------
+" Plugins Settings ===========================================================
 
-" Airline
+" Airline --------------------------------------------------------------------
 let g:airline_powerline_fonts = 1
 let g:airline_theme="simple"
 
-" Gitgutter
+" Gitgutter ------------------------------------------------------------------
 let g:gitgutter_max_signs = 10000
+let g:gitgutter_preview_win_floating = 1
+let g:gitgutter_floating_window_options = {
+      \ 'relative': 'cursor',
+      \ 'row': 1,
+      \ 'col': 0,
+      \ 'width': 64,
+      \ 'height': &previewheight,
+      \ 'style': 'minimal',
+      \ 'border': 'rounded'
+      \ }
 
-" Zig
+" Zig ------------------------------------------------------------------------
 let g:zig_fmt_autosave = 0
 
-" lspconfig
+" LSP ------------------------------------------------------------------------
+" TODO
 lua << EOF
-local lspconfig = require'lspconfig'
-local configs = require'lspconfig/configs'
-local util = require 'lspconfig/util'
+-- local lspconfig = require'lspconfig'
+-- local configs = require'lspconfig/configs'
+-- local util = require 'lspconfig/util'
+--
+-- -- C/C++
+-- lspconfig.clangd.setup{
+--     root_dir = util.root_pattern('compile_commands.json'),
+-- }
+--
+-- -- Perl
+-- lspconfig.perlls.setup{}
+EOF
 
--- C/C++
-lspconfig.clangd.setup{
-    root_dir = util.root_pattern('compile_commands.json'),
-}
+" cyberdream -----------------------------------------------------------------
+lua << EOF
+require("cyberdream").setup({
+    -- Enable transparent background
+    transparent = false,
 
--- Perl
-lspconfig.perlls.setup{}
+    -- Reduce the overall saturation of colours for a more muted look
+    saturation = 0.9, -- accepts a value between 0 and 1. 0 will be fully desaturated (greyscale) and 1 will be the full color (default)
+
+    -- Enable italics comments
+    italic_comments = true,
+
+    -- Apply a modern borderless look to pickers like Telescope, Snacks Picker & Fzf-Lua
+    borderless_pickers = true,
+})
+vim.cmd("colorscheme cyberdream")
+EOF
