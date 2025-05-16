@@ -39,6 +39,11 @@ function paths_are_same {
 }
 
 function ask {
+    if ${GITHUB_ACTIONS:-false}
+    then
+        echo "${@}? (Assuming yes because GitHub Actions)"
+        return
+    fi
     while true; do
         read -p "${@}? " yn
         case $yn in

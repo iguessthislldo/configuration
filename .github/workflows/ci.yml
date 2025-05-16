@@ -1,0 +1,28 @@
+name: CI
+on:
+  pull_request:
+  push:
+
+jobs:
+  linux-normal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: flox/install-flox-action@v2
+      - run: sudo apt install zsh gnupg
+      - name: Create /data
+        run: |
+          cd /
+          sudo mkdir data
+          sudo chown $USER:$USER data
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install
+        run: |
+         cp -r configuration /data
+         cd /data/configuration
+         bash install_data.sh
+      - name: Test
+        run: |
+         zsh -c 'e --version'
+         zsh -c 'rg --version'
