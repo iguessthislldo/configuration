@@ -5,7 +5,7 @@ sudo snap remove firefox
 # Prevent Firefox snap from coming back
 echo '
 Package: *
-Pin: release o=LP-PPA-mozillateam
+Pin: origin packages.mozilla.org
 Pin-Priority: 1001
 ' | sudo tee /etc/apt/preferences.d/mozilla-firefox
 echo '
@@ -14,13 +14,11 @@ Pin: release o=Ubuntu*
 Pin-Priority: -1
 ' | sudo tee /etc/apt/preferences.d/block-mozilla-firefox-snap
 
-# Allow automatic updates
-echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | \
-    sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
-
-# Install Firefox from Mozilla's PPA
-sudo add-apt-repository ppa:mozillateam/ppa
-sudo apt install firefox
+# Import mozilla's keys
+sudo install -d -m 0755 /etc/apt/keyrings
+wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+sudo apt-get update && sudo apt-get install firefox
 
 # DRM can crash after this: https://askubuntu.com/a/1425488
 # Also allow Firefox to use /data
