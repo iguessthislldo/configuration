@@ -1,5 +1,12 @@
-export DATA=/data
-export CONFIG=$DATA/configuration
+if [ -z ${DATA+x} ]
+then
+    export DATA=/data
+fi
+
+if [ -z ${CONFIG+x} ]
+then
+    export CONFIG=$DATA/configuration
+fi
 
 if [ -z ${ZSH_VERSION+x} ]
 then
@@ -13,16 +20,6 @@ then
     export IS_BASH=false
 else
     export IS_BASH=true
-fi
-
-if [ -z ${IGTD_IS_MINGW+x} ]
-then
-    if [ -z ${MINGW_CHOST+x} ]
-    then
-        export IGTD_IS_MINGW=false
-    else
-        export IGTD_IS_MINGW=true
-    fi
 fi
 
 if [ -f $CONFIG/machine_id.local.sh ]

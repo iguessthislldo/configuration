@@ -1,20 +1,20 @@
 #!/bin/bash
 
-if ! $complete_install
-then
-    cp sh/rc.sh $HOME/.zshrc
-    cp sh/env.sh $HOME/.zshenv
-    return
-fi
-
 InstallLink cfg
 
 # Flox
 InstallLink flox .flox
 
 # zsh
+if $doing_install
+then
+    temp_file=$(mktemp)
+    echo "export DATA=\"$install_data\"" > "$temp_file"
+    echo "export CONFIG=\"$install_config\"" >> "$temp_file"
+    echo "source \"\$CONFIG/sh/environment.sh\"" >> "$temp_file"
+    InstallFile "$temp_file" .zshenv
+fi
 InstallLink sh/rc.sh .zshrc
-InstallLink sh/environment.sh .zshenv
 
 # neovim
 InstallLink vim .config/nvim

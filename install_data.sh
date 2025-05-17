@@ -2,34 +2,92 @@
 
 set -e
 
+if [ -t 2 ]
+then
+    red_bold=`tput bold setaf 1`
+    reset=`tput sgr0`
+else
+    red_bold=""
+    reset=""
+fi
+
+function error {
+    printf "%sERROR:%s %s\n" "$red_bold" "$reset" "$1" 1>&2
+}
+
+function fatal_error {
+    error "$1"
+    exit 1
+}
+
+function if_to_var {
+    if [ $@ ]
+    then
+        echo true
+    else
+        echo false
+    fi
+}
+
+function defined_to_var {
+    local name=$1
+    local -n name_ref=$name
+    if_to_var ! -z ${name_ref+x}
+}
+
+function set_var {
+    local name=$1
+    local defined=`defined_to_var $name`
+    local type=$2
+    local -n ref=$name
+    local value=$ref
+    if ! $defined
+    then
+        value=$3
+    fi
+    case $type in
+        path)
+            if [ -z "${value}" ]
+            then
+                fatal_error "$name can't be empty or unset"
+            fi
+            value=`realpath -s $value`
+            ;;
+        bool)
+            if [[ ! $value =~ ^(true|false)$ ]]
+            then
+                fatal_error "$name not true or false: $value"
+            fi
+            ;;
+    esac
+    if $defined
+    then
+        echo "$type $name=$value"
+    else
+        echo "$type $name=$value (default)"
+    fi
+    ref="$value"
+}
+
+set_var install_data path "/data"
+set_var install_home path "$HOME"
+if [ -z ${XDG_CONFIG_HOME+x} ]
+then
+    XDG_CONFIG_HOME="$install_home/.config"
+fi
+set_var install_xdg_config_home path "$XDG_CONFIG_HOME"
+set_var install_user_dirs bool true
+set_var change_repo_to_ssh bool true
+
 subscript=".install_this.sh"
-install_data="$(realpath -s /data)"
-install_cfg="$(realpath -s $install_data/configuration)"
-install_home="$(realpath -s $HOME)"
-export_list="$(realpath -s "$install_cfg/export-list")"
+install_config=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+install_config=`realpath "$install_config"`
+echo "install_config=$install_config"
+export_list="$(realpath -s "$install_config/export-list")"
 export_file="export.txz"
-export_path="$(realpath -s "$install_cfg/$export_file")"
+export_path="$(realpath -s "$install_config/$export_file")"
 doing_export=false
 doing_install=false
-
-if [ -z ${complete_install+x} ]
-then
-    if [ -z ${MINGW_CHOST+x} ]
-    then
-        export complete_install=true
-    else
-        export complete_install=false
-    fi
-fi
-
-if $complete_install
-then
-    if [ -z ${XDG_CONFIG_HOME+x} ]
-    then
-        export XDG_CONFIG_HOME="$HOME/.config"
-    fi
-    mkdir -p "$XDG_CONFIG_HOME"
-fi
 
 function paths_are_same {
     a=$(readlink -f $1)
@@ -49,13 +107,14 @@ function ask {
         case $yn in
             [Yy]* ) return 0;;
             [Nn]* ) return 1;;
-            * ) echo "Please answer y(es) or n(o).";;
+            * ) error "Please answer y(es) or n(o).";;
         esac
     done
 }
 
 function InstallRun {
-    if ! $doing_install ; then
+    if ! $doing_install
+    then
         return
     fi
     echo "---- InstallRun $@"
@@ -64,41 +123,81 @@ function InstallRun {
 }
 
 function InstallLink {
-    if ! $doing_install ; then
+    if ! $doing_install
+    then
         return
     fi
     echo -n "---- InstallLink $@ ... "
-    if [ $# -eq 1 ]; then
-        file=$PWD
-        link=$install_home/$1
+    if [ $# -eq 1 ]
+    then
+        file="$PWD"
+        link="$install_home/$1"
     else
-        file=$PWD/$1
-        link=$install_home/$2
+        file="$PWD/$1"
+        link="$install_home/$2"
     fi
-    if [ -e $link ]; then
-        if ! paths_are_same $file $link ; then
-            echo "Error: File/Directory already exists: $link" 1>&2
-            if ask "Remove existing $link" ; then
-                rm -fr "$link"
-            else
-                if ask "Skip installing $link" ; then
-                    echo "Skipped"
-                    return 0
-                fi
-                echo "Error: alright, can't continue" 1>&2
-                exit 1
-            fi
-        else
+    if [ -e "$link" ]
+    then
+        if paths_are_same "$file" "$link"
+        then
             echo "Already Done"
             return 0
         fi
+        error "File/Directory already exists: $link"
+        if ask "Remove existing $link"
+        then
+            rm -fr "$link"
+        elif ask "Skip installing $link"
+        then
+            echo "Skipped"
+            return 0
+        else
+            fatal_error "alright, can't continue"
+        fi
     fi
-    ln -s $file $link
+    ln -s "$file" "$link"
+    echo "Done"
+}
+
+function InstallFile {
+    if ! $doing_install
+    then
+        return
+    fi
+    echo -n "---- InstallFile $@ ... "
+    src=`realpath $1`
+    dest="$install_home/$2"
+    if [ -e "$dest" ]
+    then
+        if paths_are_same "$src" "$dest"
+        then
+            echo "Already Done"
+            return 0
+        fi
+        if cmp "$src" "$dest"
+        then
+            echo "Already Done"
+            return 0
+        fi
+        error "File/Directory already exists: $dest"
+        if ask "Remove existing $dest"
+        then
+            rm -fr "$dest"
+        elif ask "Skip installing $dest"
+        then
+            echo "Skipped"
+            return 0
+        else
+            fatal_error "alright, can't continue"
+        fi
+    fi
+    cp "$src" "$dest"
     echo "Done"
 }
 
 function InstallDir {
-    if ! $doing_install ; then
+    if ! $doing_install
+    then
         return
     fi
     echo -n "---- InstallDir $@ ... "
@@ -107,7 +206,8 @@ function InstallDir {
 }
 
 function ExportFiles {
-    if ! $doing_export ; then
+    if ! $doing_export
+    then
         return
     fi
     echo "---- Has Exportable Files $1"
@@ -133,12 +233,13 @@ function action_install {
     doing_install=true
     cd $install_data
 
-    if $complete_install
+    mkdir -p "$install_xdg_config_home"
+
+    InstallLink dat
+    InstallDir bin
+
+    if $install_user_dirs
     then
-        InstallLink dat
-
-        InstallDir bin
-
         mkdir -p downloads
         InstallLink downloads dl
         mkdir -p documents
@@ -159,9 +260,9 @@ function action_install {
 
     Scan
 
-    if $complete_install
+    if $change_repo_to_ssh
     then
-        cd $install_cfg
+        cd $install_config
         echo 'Making sure git origin is SSH'
         origin='git@github.com:iguessthislldo/configuration.git'
         if [ "$(git remote get-url origin)" != "$origin" ]
@@ -187,14 +288,13 @@ function action_import {
     if [ ! -z "$1" ]
     then
         echo "Importing from $1"
-        ssh $1 'bash /data/configuration/install_data.sh export'
-        scp $1:/data/configuration/$export_file /data
+        ssh $1 'bash $CONFIG/install_data.sh export'
+        scp $1:$install_config/$export_file $install_data
     fi
-    cd /data
+    cd $install_data
     if [ ! -f "$export_file" ]
     then
-        echo "Error: $export_file not found in `pwd`" 1>&2
-        exit 1
+        fatal_error "$export_file not found in `pwd`"
     fi
     tar xf "$export_file"
 }
@@ -223,7 +323,6 @@ case $action in
         echo "install_data.sh import [SSH_ARGS]"
         ;;
     *)
-        echo "Invalid action \"$action\""
-        exit 1
+        fatal_error "Invalid action \"$action\""
         ;;
 esac
