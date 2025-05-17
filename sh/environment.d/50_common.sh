@@ -24,9 +24,4 @@ igtd_add_to_path "$HOME/.local/bin"
 igtd_add_to_path "$HOME/bin"
 igtd_add_to_path "$CONFIG/bin"
 
-if [ -z ${XDG_CONFIG_HOME+x} ]
-then
-    export XDG_CONFIG_HOME="$HOME/.config"
-fi
-
 export PYTHONPATH="$CONFIG/python-modules:$PYTHONPATH"

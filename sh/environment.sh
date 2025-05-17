@@ -8,6 +8,16 @@ then
     export CONFIG=$DATA/configuration
 fi
 
+if [ -z ${XDG_CONFIG_HOME+x} ]
+then
+    export XDG_CONFIG_HOME="$IGTD_XDG_CONFIG_HOME"
+fi
+
+if [ -z ${XDG_DATA_HOME+x} ]
+then
+    export XDG_DATA_HOME="$IGTD_XDG_DATA_HOME"
+fi
+
 if [ -z ${ZSH_VERSION+x} ]
 then
     export IS_ZSH=false

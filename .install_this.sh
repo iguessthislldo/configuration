@@ -1,9 +1,9 @@
 #!/bin/bash
 
-InstallLink cfg
+InstallLink --home cfg
 
 # Flox
-InstallLink flox .flox
+InstallLink --file flox --home .flox
 
 # zsh
 if $doing_install
@@ -11,21 +11,26 @@ then
     temp_file=$(mktemp)
     echo "export DATA=\"$install_data\"" > "$temp_file"
     echo "export CONFIG=\"$install_config\"" >> "$temp_file"
+    echo "export IGTD_XDG_CONFIG_HOME=\"$install_xdg_config_home\"" >> "$temp_file"
+    echo "export IGTD_XDG_DATA_HOME=\"$install_xdg_data_home\"" >> "$temp_file"
     echo "source \"\$CONFIG/sh/environment.sh\"" >> "$temp_file"
     InstallFile "$temp_file" .zshenv
 fi
-InstallLink sh/rc.sh .zshrc
+InstallLink --file sh/rc.sh --home .zshrc
 
 # neovim
-InstallLink vim .config/nvim
+InstallLink --file vim --xdg nvim
 
 # ptpython
-#InstallLink ptpython.py .config/ptpython/config.py
+#InstallLink --file ptpython.py --xdg ptpython/config.py
 
-InstallLink tmux .tmux.conf
+InstallLink --file tmux --home .tmux.conf
 
-InstallLink gdb .config/gdb
+InstallLink --file gdb --xdg gdb
 
-InstallLink user-dirs.dir .config/user-dirs.dirs
+if $install_user_dirs
+then
+    InstallLink --file user-dirs.dir --xdg user-dirs.dirs
+fi
 
 Scan

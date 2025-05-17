@@ -1,7 +1,6 @@
 if command -v fc-cache &> /dev/null
 then
-    InstallDir .local/share
-    InstallLink .local/share/fonts
+    InstallLink --xdg-data fonts
     InstallRun fc-cache -f -v .
     ExportFiles "-name '*.otf' -o -name '*.ttf'"
 else

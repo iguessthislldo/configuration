@@ -73,9 +73,14 @@ set_var install_data path "/data"
 set_var install_home path "$HOME"
 if [ -z ${XDG_CONFIG_HOME+x} ]
 then
-    XDG_CONFIG_HOME="$install_home/.config"
+    export XDG_CONFIG_HOME="$install_home/.config"
 fi
 set_var install_xdg_config_home path "$XDG_CONFIG_HOME"
+if [ -z ${XDG_DATA_HOME+x} ]
+then
+    export XDG_DATA_HOME="$install_home/.local/share"
+fi
+set_var install_xdg_data_home path "$XDG_DATA_HOME"
 set_var install_user_dirs bool true
 set_var change_repo_to_ssh bool true
 
@@ -112,6 +117,8 @@ function ask {
     done
 }
 
+ask "Does it look good? Continue"
+
 function InstallRun {
     if ! $doing_install
     then
@@ -128,13 +135,38 @@ function InstallLink {
         return
     fi
     echo -n "---- InstallLink $@ ... "
-    if [ $# -eq 1 ]
+    file="$PWD"
+    while [[ $# -gt 0 ]]
+    do
+        case $1 in
+            --file)
+                file="$2"
+                shift
+                shift
+                ;;
+            --home)
+                link="$install_home/$2"
+                shift
+                shift
+                ;;
+            --xdg)
+                link="$install_xdg_config_home/$2"
+                shift
+                shift
+                ;;
+            --xdg-data)
+                link="$install_xdg_data_home/$2"
+                shift
+                shift
+                ;;
+            *)
+                fatal_error "Unknown option $1"
+                ;;
+        esac
+    done
+    if [ -z "$link" ]
     then
-        file="$PWD"
-        link="$install_home/$1"
-    else
-        file="$PWD/$1"
-        link="$install_home/$2"
+        fatal_error "Need --home or --xdg"
     fi
     if [ -e "$link" ]
     then
@@ -231,31 +263,32 @@ function action_install {
     echo Installing from \"$install_data\" to \"$install_home\"
     doing_install=true
 
-    # Make sure XDG_CONFIG_HOME exists
-    mkdir -p "$install_xdg_config_home"
+    # Make sure XDG_CONFIG_HOME and XDG_DATA_HOME exist
+    InstallDir "$install_xdg_config_home"
+    InstallDir "$install_xdg_data_home"
 
     # Install Data Directory
     cd $install_data
-    InstallLink dat
+    InstallLink --home dat
     InstallDir bin
     if $install_user_dirs
     then
-        mkdir -p downloads
-        InstallLink downloads dl
-        mkdir -p documents
-        InstallLink documents docs
-        mkdir -p music
-        InstallLink music music
-        mkdir -p pictures
-        InstallLink pictures pics
-        mkdir -p videos
-        InstallLink videos vids
-        mkdir -p src
-        InstallLink src src
-        mkdir -p dev
-        InstallLink dev dev
-        mkdir -p work
-        InstallLink work work
+        InstallDir downloads
+        InstallLink --file downloads --home dl
+        InstallDir documents
+        InstallLink --file documents --home docs
+        InstallDir music
+        InstallLink --file music --home music
+        InstallDir pictures
+        InstallLink --file pictures --home pics
+        InstallDir videos
+        InstallLink --file videos --home vids
+        InstallDir src
+        InstallLink --file src --home src
+        InstallDir dev
+        InstallLink --file dev --home dev
+        InstallDir work
+        InstallLink --file work --home work
     fi
 
     # Install Configuration Directory
