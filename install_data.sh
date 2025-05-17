@@ -229,15 +229,15 @@ function Scan {
 
 function action_install {
     echo Installing from \"$install_data\" to \"$install_home\"
-
     doing_install=true
-    cd $install_data
 
+    # Make sure XDG_CONFIG_HOME exists
     mkdir -p "$install_xdg_config_home"
 
+    # Install Data Directory
+    cd $install_data
     InstallLink dat
     InstallDir bin
-
     if $install_user_dirs
     then
         mkdir -p downloads
@@ -258,6 +258,8 @@ function action_install {
         InstallLink work work
     fi
 
+    # Install Configuration Directory
+    cd $install_config
     Scan
 
     if $change_repo_to_ssh
