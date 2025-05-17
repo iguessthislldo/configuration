@@ -187,6 +187,7 @@ function InstallLink {
             fatal_error "alright, can't continue"
         fi
     fi
+    echo ln -s "$file" "$link"
     ln -s "$file" "$link"
     echo "Done"
 }
