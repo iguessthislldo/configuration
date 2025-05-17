@@ -14,10 +14,11 @@ jobs:
       - run: sudo apt install zsh gnupg
       - name: Install
         run: |
+          # /data conflicts with GitHub Actions
           mkdir "$HOME/data"
           export install_data="$HOME/data"
-          mkdir "$HOME/home"
-          export install_home="$HOME/home"
+          # work conflicts with GitHub Actions
+          export install_user_dirs=false
           export change_repo_to_ssh=false
           ./install_data.sh
       - name: Test
