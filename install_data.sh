@@ -260,7 +260,7 @@ function action_install {
 
     # Install Configuration Directory
     cd $install_config
-    Scan
+    source .install_this.sh
 
     if $change_repo_to_ssh
     then
