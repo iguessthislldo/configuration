@@ -21,11 +21,8 @@ jobs:
           export install_user_dirs=false
           export change_repo_to_ssh=false
           ./install_data.sh
-      - name: Test
-        run: |
-          tree -L 2 "$HOME/home"
-          tree -L 2 "$HOME/data"
-          tree -L 2 .
+      - name: Show Home Directory
+        run: tree -L 2 "$HOME"
       - name: Test
         run: |
           zsh -c 'e --version'
