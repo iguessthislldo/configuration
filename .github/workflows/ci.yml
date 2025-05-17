@@ -13,13 +13,10 @@ jobs:
       - uses: flox/install-flox-action@v2
       - run: sudo apt install zsh gnupg
       - name: Install
-        run: |
-          cd configuration
-          install_data=data change_repo_to_ssh=false ./install_data.sh
+        run: install_data=data change_repo_to_ssh=false ./install_data.sh
       - name: Test
         run: |
           tree -L 2 "$HOME"
-          cd configuration
           tree -L 2 .
       - name: Test
         run: |
