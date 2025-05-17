@@ -17,13 +17,16 @@ jobs:
           # /data conflicts with GitHub Actions
           mkdir "$HOME/data"
           export install_data="$HOME/data"
-          # work conflicts with GitHub Actions
-          export install_user_dirs=false
+          mkdir "$HOME/home"
+          export install_home="$HOME/home"
           export change_repo_to_ssh=false
           ./install_data.sh
-      - name: Show Home Directory
-        run: tree -L 2 "$HOME"
+      - name: Show Directories
+        run: |
+          tree -L 2 "$HOME/data"
+          tree -L 2 "$HOME/home"
       - name: Test
         run: |
+          export HOME="$HOME/home"
           zsh -i -c 'e --version'
           zsh -i -c 'rg --version'
