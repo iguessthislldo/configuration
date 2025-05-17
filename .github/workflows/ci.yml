@@ -25,5 +25,5 @@ jobs:
         run: tree -L 2 "$HOME"
       - name: Test
         run: |
-          zsh -c 'e --version'
-          zsh -c 'rg --version'
+          zsh -i -c 'e --version'
+          zsh -i -c 'rg --version'
