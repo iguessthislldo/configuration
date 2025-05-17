@@ -264,8 +264,8 @@ function action_install {
     doing_install=true
 
     # Make sure XDG_CONFIG_HOME and XDG_DATA_HOME exist
-    InstallDir "$install_xdg_config_home"
-    InstallDir "$install_xdg_data_home"
+    mkdir -p "$install_xdg_config_home"
+    mkdir -p "$install_xdg_data_home"
 
     # Install Data Directory
     cd $install_data
@@ -273,21 +273,21 @@ function action_install {
     InstallDir bin
     if $install_user_dirs
     then
-        InstallDir downloads
+        mkdir -p downloads
         InstallLink --file downloads --home dl
-        InstallDir documents
+        mkdir -p documents
         InstallLink --file documents --home docs
-        InstallDir music
+        mkdir -p music
         InstallLink --file music --home music
-        InstallDir pictures
+        mkdir -p pictures
         InstallLink --file pictures --home pics
-        InstallDir videos
+        mkdir -p videos
         InstallLink --file videos --home vids
-        InstallDir src
+        mkdir -p src
         InstallLink --file src --home src
-        InstallDir dev
+        mkdir -p dev
         InstallLink --file dev --home dev
-        InstallDir work
+        mkdir -p work
         InstallLink --file work --home work
     fi
 
