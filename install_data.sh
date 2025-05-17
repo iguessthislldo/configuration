@@ -140,7 +140,7 @@ function InstallLink {
     do
         case $1 in
             --file)
-                file="$2"
+                file=`realpath -s $2`
                 shift
                 shift
                 ;;
@@ -187,7 +187,6 @@ function InstallLink {
             fatal_error "alright, can't continue"
         fi
     fi
-    echo ln -s "$file" "$link"
     ln -s "$file" "$link"
     echo "Done"
 }

@@ -32,7 +32,5 @@ jobs:
         run: |
           export HOME="$HOME/home"
           export XDG_CONFIG_HOME="$HOME/home/.config"
-          realpath $HOME/.zshrc
-          realpath $XDG_CONFIG_HOME
           zsh -i -c 'source $HOME/.zshrc ; e --version'
           zsh -i -c 'source $HOME/.zshrc ; rg --version'
