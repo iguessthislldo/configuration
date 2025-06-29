@@ -15,9 +15,6 @@ set undodir=~/cfg/vim/undo_dir
 set number
 set numberwidth=2
 
-" Disable Mouse
-set mouse=
-
 " Update spl file if needed
 " from https://vi.stackexchange.com/a/5052
 for d in glob(g:vim_home . '/spell/*.add', 1, 1)
