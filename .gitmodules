@@ -4,3 +4,6 @@
 [submodule "sh/oh-my-zsh/custom/plugins/autoupdate"]
 	path = sh/oh-my-zsh/custom/plugins/autoupdate
 	url = https://github.com/Dave4272-Office/autoupdate-oh-my-zsh-plugins
+[submodule "sh/oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
+	path = sh/oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
