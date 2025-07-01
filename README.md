@@ -110,15 +110,6 @@ See `gitid -h` for usage.
 
 TODO: Info on how to setup identities
 
-#### `new`
-
-Create copies of a template directory, optionally automatically replacing
-macros and executing scripts.
-
-See `new -h` for usage.
-
-TODO: More info, like how to setup templates
-
 #### `makej`
 
 Usage: `makej [ARGS...]`
@@ -135,11 +126,6 @@ and starts an instance of the current shell with that `setenv.sh` sourced.
 Command checks the current directory and all of its parents for a Python
 virtualenv, and starts an instance of the current shell with that virtualenv
 activated.
-
-#### `rrun`
-
-Recursively check the current directory and all of its parents for a file with
-an execute permission on it and executes it.
 
 #### `args`
 

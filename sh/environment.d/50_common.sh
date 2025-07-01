@@ -1,9 +1,7 @@
-if [ -z ${ARCHFLAGS+x} ]
+if [ -z ${EDITOR+x} ]
 then
-    export ARCHFLAGS="-arch x86_64"
+    export EDITOR=nvim
 fi
-
-export EDITOR=nvim
 
 if [ -z ${IGTD_EDITOR_IS_VI+x} ]
 then
@@ -23,5 +21,3 @@ fi
 igtd_add_to_path "$HOME/.local/bin"
 igtd_add_to_path "$HOME/bin"
 igtd_add_to_path "$CONFIG/bin"
-
-export PYTHONPATH="$CONFIG/python-modules:$PYTHONPATH"

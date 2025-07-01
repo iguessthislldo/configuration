@@ -6,16 +6,13 @@ COMPLETION_WAITING_DOTS="true"
 
 plugins=(
     cake
-    new
     docker
     pip
     sudo
     systemd
 
     # 3rd Party
-    autoupdate
-    nix-shell
-    nix-zsh-completions
+    #autoupdate
 )
 
 export ZSH=$CONFIG/sh/oh-my-zsh/ohmyzsh

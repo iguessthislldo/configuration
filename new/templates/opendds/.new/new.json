@@ -1,3 +1,0 @@
-{
-    "new_post_command": ["bash", "clone_opendds.sh"]
-}
