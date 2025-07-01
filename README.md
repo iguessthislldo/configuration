@@ -1,8 +1,20 @@
-# Linux Configuration Files
+# Configuration Files
 
 My framework for my configuration/dot files.
 
 ## Setup
+
+### Setup Environment Variables
+
+| Name | Default | Description |
+| --- | --- | --- |
+| `install_data` | `/data` | |
+| `install_home` | `$HOME` | |
+| `install_xdg_config_home` | `$XDG_CONFIG_HOME` or else `$install_home/.config` | |
+| `install_xdg_data_home` | `$XDG_DATA_HOME` or else `$install_home/.local/share` | |
+| `install_user_dirs` | `true` | Create and link replacements for common home directories in `$install_data` |
+
+### Linux Setup
 
 - Install [Flox](https://flox.dev/docs/install-flox/)
 - Make sure these programs are installed:
@@ -11,8 +23,7 @@ My framework for my configuration/dot files.
     - xclip (optional?)
     - git
     - Ex: `sudo apt install zsh gnupg xclip git`
-- Create a `/data` directory (TODO: Ability to have it somewhere else?)
-    - `cd /`
+- Create a `/data` directory (or whatever `$install_data` is)
     - `sudo mkdir /data`
     - `sudo chown $USER:$USER /data`
 - Place/clone this repository at `/data/configuration`.
@@ -41,7 +52,7 @@ My framework for my configuration/dot files.
 - Set terminal font if desired.
 - Run `(cd ~/cfg/git && bash setup.sh)` to setup Git.
 
-### Rest of Setup
+#### Rest of Setup
 
 Run scripts in `misc-setup` as needed.
 

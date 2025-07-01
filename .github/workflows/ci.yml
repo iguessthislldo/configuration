@@ -15,12 +15,12 @@ jobs:
       - name: Install
         run: |
           # /data conflicts with GitHub Actions
-          mkdir "$HOME/data"
           export install_data="$HOME/data"
-          mkdir "$HOME/home"
+          mkdir "$install_data"
           export install_home="$HOME/home"
-          mkdir "$HOME/home/.config"
-          export install_xdg_config_home="$HOME/home/.config"
+          mkdir "$install_home"
+          export install_xdg_config_home="$install_home/.config"
+          mkdir "$install_xdg_config_home"
           ./install_data.sh
       - name: Show Directories
         run: |
@@ -29,6 +29,6 @@ jobs:
       - name: Test
         run: |
           export HOME="$HOME/home"
-          export XDG_CONFIG_HOME="$HOME/home/.config"
+          export XDG_CONFIG_HOME="$HOME/.config"
           zsh -i -c 'source $HOME/.zshrc ; e --version'
           zsh -i -c 'source $HOME/.zshrc ; rg --version'
