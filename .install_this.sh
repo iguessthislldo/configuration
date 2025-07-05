@@ -22,7 +22,7 @@ InstallLink --file sh/rc.sh --home .zshrc
 InstallLink --file vim --xdg nvim
 
 # ptpython
-#InstallLink --file ptpython.py --xdg ptpython/config.py
+InstallLink --file ptpython.py --xdg ptpython/config.py
 
 InstallLink --file tmux --home .tmux.conf
 

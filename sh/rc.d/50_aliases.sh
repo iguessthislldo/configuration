@@ -1,24 +1,21 @@
-if command -v xdg-open &> /dev/null
-then
-    alias o="xdg-open"
-fi
+function alias-if {
+    local alias_name="$1"
+    shift
+    while (( "$#" ))
+    do
+        local command="$1"
+        shift
+        local command_name=$(echo "$command"| cut -d " " -f1)
+        if command -v "$command_name" &> /dev/null
+        then
+            alias "$alias_name=$command"
+            break
+        fi
+    done
+}
 
-if ! command -v py &> /dev/null
-then
-    if command -v ptpython3 &> /dev/null
-    then
-        alias py="ptpython3"
-    elif command -v ipython &> /dev/null
-    then
-        alias py="ipython"
-    elif command -v python3 &> /dev/null
-    then
-        alias py="python3"
-    elif command -v python &> /dev/null
-    then
-        alias py="python"
-    fi
-fi
+alias-if o xdg-open start
+alias-if p ptipython3 ipython python3 'py -3' python
 
 alias l="ls --color=always --classify --group-directories-first"
 alias cl="clear && l"

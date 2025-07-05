@@ -20,9 +20,13 @@ My framework for my configuration/dot files.
 - Make sure these programs are installed:
     - Zsh
     - GnuPG
-    - xclip (optional?)
     - git
-    - Ex: `sudo apt install zsh gnupg xclip git`
+    - Ex: `sudo apt install zsh gnupg git`
+    - Optionally:
+        - xclip
+        - ptpython
+        - ipython
+        - Ex: `sudo apt install xclip ptpython ipython`
 - Create a `/data` directory (or whatever `$install_data` is)
     - `sudo mkdir /data`
     - `sudo chown $USER:$USER /data`
