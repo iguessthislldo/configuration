@@ -32,3 +32,8 @@ jobs:
           export XDG_CONFIG_HOME="$HOME/.config"
           zsh -i -c 'source $HOME/.zshrc ; e --version'
           zsh -i -c 'source $HOME/.zshrc ; rg --version'
+      - name: Benchmark Zsh
+        run: |
+          export HOME="$HOME/home"
+          export XDG_CONFIG_HOME="$HOME/.config"
+          $HOME/cfg/sh/zsh-bench/zsh-bench

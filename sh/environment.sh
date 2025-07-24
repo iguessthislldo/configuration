@@ -1,3 +1,9 @@
+function igtd_cmd_time_now {
+    echo $(($(date +%s%N)/1000000))
+}
+
+IGTD_CMD_TIME_BEGIN=$(igtd_cmd_time_now)
+
 if [ -z ${DATA+x} ]
 then
     export DATA=/data

@@ -1,5 +1,5 @@
 function preexec() {
-    IGTD_CMD_TIME_BEGIN=$(($(date +%s%N)/1000000))
+    IGTD_CMD_TIME_BEGIN=$(igtd_cmd_time_now)
 }
 
 function print_time {
@@ -38,7 +38,7 @@ function precmd() {
             unset IGTD_CMD_EXIT_STATUS
         fi
 
-        local now=$(($(date +%s%N)/1000000))
+        local now=$(igtd_cmd_time_now)
         export IGTD_CMD_TIME="$(humanize_millsec $(($now-$IGTD_CMD_TIME_BEGIN)))"
         unset IGTD_CMD_TIME_BEGIN
     fi

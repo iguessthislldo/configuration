@@ -7,3 +7,6 @@
 [submodule "sh/oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
 	path = sh/oh-my-zsh/custom/plugins/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "sh/zsh-bench"]
+	path = sh/zsh-bench
+	url = https://github.com/romkatv/zsh-bench
