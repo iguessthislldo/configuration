@@ -24,6 +24,9 @@
       "ripgrep": {
         "pkg-path": "ripgrep"
       },
+      "tldr": {
+        "pkg-path": "tldr"
+      },
       "tree": {
         "pkg-path": "tree"
       }
@@ -884,6 +887,126 @@
       ],
       "outputs": {
         "out": "/nix/store/8m8bfl2xl7vpr8qlibgb0cd3ybkkmn3j-ripgrep-14.1.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tldr",
+      "broken": false,
+      "derivation": "/nix/store/2m56lzvbwh285wfma4ib0rdqzsm857j1-tldr-3.3.0.drv",
+      "description": "Simplified and community-driven man pages",
+      "install_id": "tldr",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6e987485eb2c77e5dcc5af4e3c70843711ef9251",
+      "name": "tldr-3.3.0",
+      "pname": "tldr",
+      "rev": "6e987485eb2c77e5dcc5af4e3c70843711ef9251",
+      "rev_count": 831064,
+      "rev_date": "2025-07-16T17:35:22Z",
+      "scrape_date": "2025-07-19T00:33:25.642779Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/ai8nyfk7sb9vqckk6klyh1k7qw7q6szh-tldr-3.3.0-dist",
+        "out": "/nix/store/gznwd2rp3blgv7fwjxl102rxbm3k4rcp-tldr-3.3.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tldr",
+      "broken": false,
+      "derivation": "/nix/store/1wydv97hnk2ffxbn1nwqkbwg2mrypdcf-tldr-3.3.0.drv",
+      "description": "Simplified and community-driven man pages",
+      "install_id": "tldr",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6e987485eb2c77e5dcc5af4e3c70843711ef9251",
+      "name": "tldr-3.3.0",
+      "pname": "tldr",
+      "rev": "6e987485eb2c77e5dcc5af4e3c70843711ef9251",
+      "rev_count": 831064,
+      "rev_date": "2025-07-16T17:35:22Z",
+      "scrape_date": "2025-07-19T00:59:24.046864Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/48sf0pc05wli9c6bnmbwnxvh9bnl9rn6-tldr-3.3.0-dist",
+        "out": "/nix/store/1s03vs9xb8k3b0f9pa43k7nqg6qk32df-tldr-3.3.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tldr",
+      "broken": false,
+      "derivation": "/nix/store/7hgj05h12s8vhpf9z3dh9gh8n04l5wjd-tldr-3.3.0.drv",
+      "description": "Simplified and community-driven man pages",
+      "install_id": "tldr",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6e987485eb2c77e5dcc5af4e3c70843711ef9251",
+      "name": "tldr-3.3.0",
+      "pname": "tldr",
+      "rev": "6e987485eb2c77e5dcc5af4e3c70843711ef9251",
+      "rev_count": 831064,
+      "rev_date": "2025-07-16T17:35:22Z",
+      "scrape_date": "2025-07-19T01:22:04.195742Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/2j0pnmiwywlxygxaqig1jwif9lbgiv1l-tldr-3.3.0-dist",
+        "out": "/nix/store/8qzy7ddrd6ligrxa73q2b5808lp8m8zz-tldr-3.3.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tldr",
+      "broken": false,
+      "derivation": "/nix/store/yxg9gk68cgc340mj67pdh6c1w614d19h-tldr-3.3.0.drv",
+      "description": "Simplified and community-driven man pages",
+      "install_id": "tldr",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6e987485eb2c77e5dcc5af4e3c70843711ef9251",
+      "name": "tldr-3.3.0",
+      "pname": "tldr",
+      "rev": "6e987485eb2c77e5dcc5af4e3c70843711ef9251",
+      "rev_count": 831064,
+      "rev_date": "2025-07-16T17:35:22Z",
+      "scrape_date": "2025-07-19T01:49:55.458504Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/yak2m296w67y9mgi5imnqay9jsh3mi8i-tldr-3.3.0-dist",
+        "out": "/nix/store/mwfzi8ky4871lymad6i3yly21fygiy6i-tldr-3.3.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
