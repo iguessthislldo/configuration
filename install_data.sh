@@ -167,6 +167,11 @@ function InstallLink {
     then
         fatal_error "Need --home or --xdg"
     fi
+    dirname=$(dirname "$link")
+    if [ ! -d "$dirname" ]
+    then
+        mkdir -p "$dirname"
+    fi
     if [ -e "$link" ]
     then
         if paths_are_same "$file" "$link"
