@@ -47,6 +47,10 @@ jobs:
           set timeout 60
           expect {
             -re {.*configuration%.*} {}
+            {Ignore insecure directories and continue [y] or abort compinit [n]?} {
+                send "y\r"
+                exp_continue
+            }
             timeout {
                 puts stderr "ERROR: Timedout waiting for initial shell prompt"
                 exit 1
