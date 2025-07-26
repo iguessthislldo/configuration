@@ -6,6 +6,9 @@ on:
 jobs:
   linux:
     runs-on: ubuntu-latest
+    env:
+      test_home: "${{github.workspace}}/test_home"
+      test_data: "${{github.workspace}}/test_data"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -15,22 +18,28 @@ jobs:
       - name: Install
         run: |
           # /data conflicts with GitHub Actions
-          export install_data="$HOME/data"
+          export install_data="${{env.test_data}}"
           mkdir "$install_data"
-          export install_home="$HOME/home"
+          export install_home="${{env.test_home}}"
           mkdir "$install_home"
           export install_xdg_config_home="$install_home/.config"
           mkdir "$install_xdg_config_home"
           ./install_data.sh
       - name: Show Directories
         run: |
-          tree -a -L 2 "$HOME/data"
-          tree -a -L 2 "$HOME/home"
+          tree -a -L 2 "${{env.test_data}}"
+          tree -a -L 2 "${{env.test_home}}"
       - name: Test Neovim
-        shell: 'HOME="$HOME/home" XDG_CONFIG_HOME="$HOME/.config" script -q -e -c "zsh -i -e {0}"'
+        shell: 'script -q -e -c "zsh -i -e {0}"'
+        env:
+          HOME: "${{env.test_home}}"
+          XDG_CONFIG_HOME: "${{env.test_home}}/.config" 
         run: e --version
       - name: Test RipGrep
-        shell: 'HOME="$HOME/home" XDG_CONFIG_HOME="$HOME/.config" script -q -e -c "zsh -i -e {0}"'
+        shell: 'script -q -e -c "zsh -i -e {0}"'
+        env:
+          HOME: "${{env.test_home}}"
+          XDG_CONFIG_HOME: "${{env.test_home}}/.config" 
         run: rg --version
       # - name: Benchmark Zsh
       #   run: |
