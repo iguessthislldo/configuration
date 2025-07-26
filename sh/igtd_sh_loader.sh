@@ -4,6 +4,11 @@ function igtd_sh_loader { # LOCATION
         local IGTD_SH_LOADER_DEBUG=false
     fi
 
+    if [ -z ${IGTD_SH_LOADER_VERBOSE+x} ]
+    then
+        local IGTD_SH_LOADER_VERBOSE=false
+    fi
+
     local find_args=(-name '*.sh')
 
     if $IS_ZSH
@@ -42,6 +47,10 @@ function igtd_sh_loader { # LOCATION
         then
             echo $f
         else
+            if $IGTD_SH_LOADER_VERBOSE
+            then
+                echo $f
+            fi
             source $f
         fi
     done

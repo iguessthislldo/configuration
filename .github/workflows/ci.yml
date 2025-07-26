@@ -9,6 +9,13 @@ jobs:
     env:
       test_home: "${{github.workspace}}/test_home"
       test_data: "${{github.workspace}}/test_data"
+      test_xdg_config_home: "${{env.test_home}}/.config"
+      isolated_zsh: 'env -i -
+        HOME=${{env.test_home}}
+        XDG_CONFIG_HOME=${{env.test_home}}
+        TERM=xterm
+        IGTD_SH_LOADER_VERBOSE=true
+        script --quiet --return --command "zsh -i -e -s"'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,16 +37,10 @@ jobs:
           tree -a -L 2 "${{env.test_data}}"
           tree -a -L 2 "${{env.test_home}}"
       - name: Test Neovim
-        shell: 'script -q -e -c "zsh -i -e {0}"'
-        env:
-          HOME: "${{env.test_home}}"
-          XDG_CONFIG_HOME: "${{env.test_home}}/.config" 
+        shell: "bash -c 'cat {0} > ${{env.isolated_zsh}}'"
         run: e --version
       - name: Test RipGrep
-        shell: 'script -q -e -c "zsh -i -e {0}"'
-        env:
-          HOME: "${{env.test_home}}"
-          XDG_CONFIG_HOME: "${{env.test_home}}/.config" 
+        shell: "bash -c 'cat {0} > ${{env.isolated_zsh}}'"
         run: rg --version
       # - name: Benchmark Zsh
       #   run: |
