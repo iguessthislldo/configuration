@@ -32,12 +32,17 @@ jobs:
           tree -a -L 2 "${test_data}"
           tree -a -L 2 "${test_home}"
           tree -a -L 2 "${test_xdg_config_home}"
+      - name: Zsh Compaudit
+        run: |
+          env --ignore-environment - \
+            HOME=$test_home \
+            XDG_CONFIG_HOME=$test_xdg_config_home \
+            zsh -i -c 'source $HOME/.zshrc ; compaudit'
       - name: Run Flox for the First Time
         run: |
           env --ignore-environment - \
             HOME=$test_home \
             XDG_CONFIG_HOME=$test_xdg_config_home \
-            TERM=dumb \
             flox activate --dir $test_home -- true
       - name: Create isolated-zsh
         run: |
@@ -52,11 +57,31 @@ jobs:
             IGTD_SH_LOADER_VERBOSE=true \\
             zsh -i -e
           set timeout 60
-          expect -re {.*configuration%.*}
+          expect {
+            -re {.*configuration%.*} {}
+            timeout {
+                puts stderr "ERROR: Timedout waiting for initial shell prompt"
+                exit 1
+            }
+          }
+
           send "$cmd\r"
-          expect -re {.*configuration%.*}
+          expect {
+            -re {.*configuration%.*} {}
+            timeout {
+                puts stderr "ERROR: Timedout waiting for second shell prompt"
+                exit 1
+            }
+          }
+
           send "exit\r"
-          expect eof
+          expect {
+            eof {}
+            timeout {
+                puts stderr "ERROR: Timedout waiting for eof"
+                exit 1
+            }
+          }
           EOF
           chmod +x $zsh
       - name: Test Neovim
