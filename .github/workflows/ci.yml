@@ -26,14 +26,14 @@ jobs:
         run: |
           tree -a -L 2 "$HOME/data"
           tree -a -L 2 "$HOME/home"
-      - name: Test
-        run: |
-          export HOME="$HOME/home"
-          export XDG_CONFIG_HOME="$HOME/.config"
-          zsh -i -c 'source $HOME/.zshrc ; e --version'
-          zsh -i -c 'source $HOME/.zshrc ; rg --version'
-      - name: Benchmark Zsh
-        run: |
-          export HOME="$HOME/home"
-          export XDG_CONFIG_HOME="$HOME/.config"
-          $HOME/cfg/sh/zsh-bench/zsh-bench
+      - name: Test Neovim
+        shell: 'HOME="$HOME/home" XDG_CONFIG_HOME="$HOME/.config" script -q -e -c "zsh -i -e {0}"'
+        run: e --version
+      - name: Test RipGrep
+        shell: 'HOME="$HOME/home" XDG_CONFIG_HOME="$HOME/.config" script -q -e -c "zsh -i -e {0}"'
+        run: rg --version
+      # - name: Benchmark Zsh
+      #   run: |
+      #     export HOME="$HOME/home"
+      #     export XDG_CONFIG_HOME="$HOME/.config"
+      #     $HOME/cfg/sh/zsh-bench/zsh-bench
