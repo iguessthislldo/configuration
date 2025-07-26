@@ -50,7 +50,7 @@ jobs:
             XDG_CONFIG_HOME=$test_xdg_config_home \\
             TERM=dumb \\
             IGTD_SH_LOADER_VERBOSE=true \\
-            script --quiet --return --command "zsh -i -e"
+            zsh -i -e
           set timeout 60
           expect -re {.*configuration%.*}
           send "$cmd\r"
@@ -60,16 +60,8 @@ jobs:
           EOF
           chmod +x $zsh
       - name: Test Neovim
-        # shell: /home/runner/isolated-zsh {0}
-        # run: e --version
-        run: |
-          export HOME="$HOME/home"
-          export XDG_CONFIG_HOME="$HOME/.config"
-          zsh -i -c 'source $HOME/.zshrc ; e --version'
+        shell: /home/runner/isolated-zsh {0}
+        run: e --version
       - name: Test RipGrep
-        # shell: /home/runner/isolated-zsh {0}
-        # run: rg --version
-        run: |
-          export HOME="$HOME/home"
-          export XDG_CONFIG_HOME="$HOME/.config"
-          zsh -i -c 'source $HOME/.zshrc ; rg --version'
+        shell: /home/runner/isolated-zsh {0}
+        run: rg --version
