@@ -49,9 +49,17 @@ function igtd_sh_loader { # LOCATION
         else
             if $IGTD_SH_LOADER_VERBOSE
             then
-                echo $f
+                echo ">>>>>>>>>> $f"
+                local before_source=$(igtd_time_now)
             fi
+
             source $f
+
+            if $IGTD_SH_LOADER_VERBOSE
+            then
+                local after_source=$(igtd_time_now)
+                echo "----- $(igtd_humanize_millsec $(($after_source-$before_source)))"
+            fi
         fi
     done
 }

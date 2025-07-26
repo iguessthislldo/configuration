@@ -1,29 +1,5 @@
 function preexec() {
-    IGTD_CMD_TIME_BEGIN=$(igtd_cmd_time_now)
-}
-
-function print_time {
-    local name=$1
-    local number=$2
-    local after=${3- }
-    if [ $number -gt 0 ]
-    then
-        local s='s'
-        if [ $number -eq 1 ]
-        then
-            s=''
-        fi
-        printf '%d %s%s%s' $number $name $s "$after"
-    fi
-}
-
-function humanize_millsec {
-    local total_milliseconds=$1
-    print_time day $((total_milliseconds/1000/60/60/24))
-    print_time hour $((total_milliseconds/1000/60/60%24))
-    print_time minute $((total_milliseconds/1000/60%60))
-    print_time second $((total_milliseconds/1000%60))
-    print_time millisecond $((total_milliseconds%1000)) ''
+    IGTD_CMD_TIME_BEGIN=$(igtd_time_now)
 }
 
 function precmd() {
@@ -38,8 +14,8 @@ function precmd() {
             unset IGTD_CMD_EXIT_STATUS
         fi
 
-        local now=$(igtd_cmd_time_now)
-        export IGTD_CMD_TIME="$(humanize_millsec $(($now-$IGTD_CMD_TIME_BEGIN)))"
+        local now=$(igtd_time_now)
+        export IGTD_CMD_TIME="$(igtd_humanize_millsec $(($now-$IGTD_CMD_TIME_BEGIN)))"
         unset IGTD_CMD_TIME_BEGIN
     fi
 }
