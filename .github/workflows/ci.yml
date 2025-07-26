@@ -45,9 +45,9 @@ jobs:
             IGTD_SH_LOADER_VERBOSE=true \\
             zsh -i -e
           set timeout 60
-          expect -notransfer {
+          expect {
             -re {.*configuration%.*} {}
-            {Ignore insecure directories and continue [y] or abort compinit [n]?} {
+            -re {Ignore insecure directories and continue \\[y\\] or abort compinit \\[n\\]\\?.*} {
                 send "y\r"
                 exp_continue
             }
