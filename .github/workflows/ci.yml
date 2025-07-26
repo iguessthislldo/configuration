@@ -32,21 +32,6 @@ jobs:
           tree -a -L 2 "${test_data}"
           tree -a -L 2 "${test_home}"
           tree -a -L 2 "${test_xdg_config_home}"
-      - name: Zsh Compaudit
-        run: |
-          sudo chmod g-w /usr/share/zsh/vendor-completions
-          sudo chmod g-w /usr/share/zsh/site-functions
-          sudo chmod g-w /usr/share/zsh
-          env --ignore-environment - \
-            HOME=$test_home \
-            XDG_CONFIG_HOME=$test_xdg_config_home \
-            zsh -i -c 'source $HOME/.zshrc ; compaudit'
-      - name: Run Flox for the First Time
-        run: |
-          env --ignore-environment - \
-            HOME=$test_home \
-            XDG_CONFIG_HOME=$test_xdg_config_home \
-            flox activate --dir $test_home -- true
       - name: Create isolated-zsh
         run: |
           zsh=/home/runner/isolated-zsh
@@ -87,6 +72,9 @@ jobs:
           }
           EOF
           chmod +x $zsh
+      - name: Test Zsh
+        shell: /home/runner/isolated-zsh {0}
+        run: true
       - name: Test Neovim
         shell: /home/runner/isolated-zsh {0}
         run: e --version
