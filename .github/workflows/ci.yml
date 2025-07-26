@@ -16,7 +16,7 @@ jobs:
         with:
           submodules: recursive
       - uses: flox/install-flox-action@v2
-      - run: sudo apt install zsh gnupg
+      - run: sudo apt install zsh gnupg expect
       - name: Install
         run: |
           # /data conflicts with GitHub Actions
@@ -36,20 +36,27 @@ jobs:
         run: |
           zsh=/home/runner/isolated-zsh
           tee $zsh << EOF
-          #!/bin/bash
-          exec env --ignore-environment - \\
+          #!/usr/bin/expect -f
+          set cmd [join $argv " "]
+          spawn env --ignore-environment - \\
             HOME=$test_home \\
             XDG_CONFIG_HOME=$test_xdg_config_home \\
-            TERM=xterm \\
+            TERM=dumb \\
             IGTD_SH_LOADER_VERBOSE=true \\
-            script --quiet --return --command "zsh -i -e -s"
+            script --quiet --return --command "zsh -i -e"
+          set timeout 60
+          expect -re {.*configuration%.*}
+          send "$cmd\r"
+          expect -re {.*configuration%.*}
+          send "exit\r"
+          expect eof
           EOF
           chmod +x $zsh
       - name: Test Neovim
-        shell: "bash -c \"cat {0} | /home/runner/isolated-zsh\""
+        shell: /home/runner/isolated-zsh {0}
         run: e --version
       - name: Test RipGrep
-        shell: "bash -c \"cat {0} | /home/runner/isolated-zsh\""
+        shell: /home/runner/isolated-zsh {0}
         run: rg --version
       # - name: Benchmark Zsh
       #   run: |
