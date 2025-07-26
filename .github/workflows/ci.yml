@@ -34,6 +34,9 @@ jobs:
           tree -a -L 2 "${test_xdg_config_home}"
       - name: Zsh Compaudit
         run: |
+          sudo chmod g-w /usr/share/zsh/vendor-completions
+          sudo chmod g-w /usr/share/zsh/site-functions
+          sudo chmod g-w /usr/share/zsh
           env --ignore-environment - \
             HOME=$test_home \
             XDG_CONFIG_HOME=$test_xdg_config_home \
