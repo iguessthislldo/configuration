@@ -29,6 +29,7 @@ Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'habamax/vim-rst'
 Plug 'scottmckendry/cyberdream.nvim'
+Plug 'folke/which-key.nvim'
 
 " Use local copy of vim-opendds, else download it
 if isdirectory(expand('$LOCAL_VIM_OPENDDS'))
