@@ -93,6 +93,20 @@ export_path="$(realpath -s "$install_config/$export_file")"
 doing_export=false
 doing_install=false
 
+if [[ $(grep MINGW64_NT /proc/version) ]]
+then
+    echo This is MSYS2
+    if [[ "$MSYS" == *"winsymlinks:nativestrict"* ]]
+    then
+        echo "Using native links"
+    elif [[ "$MSYS" == *"winsymlinks:lnk"* ]]
+    then
+        echo "Using shortcut-based links"
+    else
+        fatal_error "MSYS must have winsymlinks:nativestrict or winsymlinks:lnk"
+    fi
+fi
+
 function paths_are_same {
     a=$(readlink -f $1)
     b=$(readlink -f $2)

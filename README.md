@@ -68,6 +68,38 @@ Run scripts in `misc-setup` as needed.
 - Run `$CONFIG/misc-setup/exclusive-perms.sh $CONFIG/gnupg` if gnupg has
   problems signing git commits.
 
+### MSYS2 Setup
+
+- **NEEDS MORE WORK**
+    - neovim config is broken
+    - zsh is broken until a nested shell is started
+    - Need to apply workaround in https://github.com/airblade/vim-gitgutter/pull/905
+    - Figure out what's broken in shortcut based setup vs native symlinks
+    - Setup wezterm?
+
+- [Install MSYS2](https://www.msys2.org/wiki/MSYS2-installation/)
+    - [Info on symlinks](https://www.msys2.org/docs/symlinks/)
+    - [Info on terminals](https://www.msys2.org/docs/terminals/)
+
+```
+pacman -Syu
+pacman -S git zsh
+mkdir data
+cd data
+export install_data=$(realpath .)
+export install_xdg_config_home=$(cygpath --unix "$LOCALAPPDATA")
+export install_xdg_data_home=$(cygpath --unix "$LOCALAPPDATA")
+export install_user_dirs=false
+export MSYS=winsymlinks:lnk
+git clone --recurse-submodules https://github.com/iguessthislldo/configuration
+pacman -S - < msys2-packages.txt
+bash install_data.sh
+WINTERM_SETTINGS="$LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+cp "$WINTERM_SETTINGS" "$WINTERM_SETTINGS.backup"
+jq --slurpfile p msys2-win-term-profile.json '.profiles.list += $p | .defaultProfile = $p[0].guid' "$WINTERM_SETTINGS" > "$TEMP/settings.json"
+mv "$TEMP/settings.json" "$WINTERM_SETTINGS"
+```
+
 ## Directory Structure
 
 - `data`: Used for `$DATA`, Linked as `$HOME\dat`

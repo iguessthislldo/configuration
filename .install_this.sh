@@ -13,6 +13,10 @@ then
     echo "export CONFIG=\"$install_config\"" >> "$temp_file"
     echo "export IGTD_XDG_CONFIG_HOME=\"$install_xdg_config_home\"" >> "$temp_file"
     echo "export IGTD_XDG_DATA_HOME=\"$install_xdg_data_home\"" >> "$temp_file"
+    if [ ! -z ${MSYS+x} ]
+    then
+        echo "export MSYS=\"$MSYS\"" >> "$temp_file"
+    fi
     echo "source \"\$CONFIG/sh/environment.sh\"" >> "$temp_file"
     InstallFile "$temp_file" .zshenv
 fi
