@@ -63,6 +63,26 @@ else
     export IS_BASH=true
 fi
 
+if [ -z ${IGTD_WSL+x} ]
+then
+    if [[ $(grep -i microsoft /proc/version) ]]
+    then
+        export IGTD_WSL=true
+    else
+        export IGTD_WSL=false
+    fi
+fi
+
+if [ -z ${IGTD_MSYS2+x} ]
+then
+    if [[ $(grep MINGW64_NT /proc/version) ]]
+    then
+        export IGTD_MSYS2=true
+    else
+        export IGTD_MSYS2=false
+    fi
+fi
+
 if [ -f $CONFIG/machine_id.local.sh ]
 then
     source $CONFIG/machine_id.local.sh
