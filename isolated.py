@@ -6,6 +6,7 @@ import os
 from subprocess import check_call, CalledProcessError
 from argparse import ArgumentParser
 from pathlib import Path
+from textwrap import dedent
 
 
 orig_cfg = Path(__file__).parent.resolve()
@@ -29,16 +30,7 @@ class Env:
         check_call(cmd, cwd=(cwd or self.cwd), env=ev)
 
 
-if __name__ == '__main__':
-    arg_parser = ArgumentParser()
-    arg_parser.add_argument('--create', action='store_true')
-    arg_parser.add_argument('--clone', action='store_true')
-    arg_parser.add_argument('root', type=Path)
-    arg_parser.add_argument('command', nargs='+')
-    args = arg_parser.parse_args()
-
-    root = args.root.resolve()
-
+def isolated_env(args, root):
     env = Env(os.environ['USER'], root / 'home')
 
     if args.create:
@@ -59,9 +51,141 @@ if __name__ == '__main__':
             cwd=install_config,
             install_data=str(install_data),
             skip_set_ssh_origin='true',
+            install_user_dirs='false',
         )
 
     elif not root.exists():
         sys.exit(f'{root} does not exist!')
 
     env.run(*args.command)
+
+
+def graph_node_i(file, ref, is_dir, name, extra=''):
+    kind = 'folder' if is_dir else 'note'
+    if extra:
+        extra = f', {extra}'
+    print(f'    {ref} [shape={kind}, label="{name}"{extra}]', file=file)
+
+
+def graph_edge(file, a, b, extra=''):
+    if extra:
+        extra = f' [{extra}]'
+    print(f'    {a} -> {b}{extra}', file=file)
+
+
+def point(depth, i):
+    return f'"p{depth}-{i}"'
+
+
+def graph_node(file, p, ref, is_dir, is_link, is_exec, name, points):
+    this_p = p / name
+    depth = len(this_p.parts) - 1
+    prev_parent, count = points.get(depth, (p, 0))
+    prev_point = point(depth, count)
+    count += 1
+    this_point = point(depth, count)
+    if count > 1 and prev_parent == p:
+        # Connect point to prev point
+        graph_edge(file, prev_point, this_point)
+    else:
+        # Connect point to parent node
+        graph_edge(file, ref, this_point)
+    this_ref = f'"{this_p}"'
+    graph_edge(file, this_point, this_ref)
+    points[depth] = (p, count)
+    extra = ''
+    if is_dir:
+        if is_link:
+            extra = 'style=filled, color=royalblue1'
+        else:
+            extra = 'style=filled, color=orange1'
+    elif is_link:
+        extra = 'style=filled, color=royalblue1'
+    elif is_exec:
+        extra = 'style=filled, color=lightgreen'
+    graph_node_i(file, this_ref, is_dir, name, extra)
+
+
+def resolve(root, p):
+    rel = p.relative_to(root)
+    if rel.parts and rel.parts[0] == '..':
+        return None
+    return Path('/') / rel
+
+
+def graph_filter(dirpath, dirnames, filenames):
+    if '.git' in filenames or dirpath.name in ['fontconfig', 'flox']:
+        # Submodule or something else we shouldn't show contents at all
+        dirnames.clear()
+        filenames.clear()
+    else:
+        # Ignore these names in directories
+        for name in ['.git', '.github', '.install_this.sh', '.gitignore', '.gitmodules']:
+            if name in dirnames:
+                dirnames.remove(name)
+            if name in filenames:
+                filenames.remove(name)
+
+
+def graph(root, file):
+    print(dedent('''\
+        strict digraph tree {
+            graph[overlap=false, splines=ortho, ranksep=0.05, rankdir=LR]
+            edge[arrowhead=none, color=black]
+        '''), file=file)
+
+    points = {}
+
+    p = Path("/")
+    ref = f'"{p}"'
+    graph_node_i(file, ref, True, str(p))
+    for dirpath, dirnames, filenames in root.walk():
+        graph_filter(dirpath, dirnames, filenames)
+
+        p = resolve(root, dirpath)
+        ref = f'"{p}"'
+
+        for name in filenames:
+            path = dirpath / name
+            realpath = path.resolve()
+            is_link = path != realpath
+            is_dir = realpath.is_dir()
+            is_exec = not is_dir and os.access(realpath, os.X_OK)
+            graph_node(file, p, ref, is_dir, is_link, is_exec, name, points)
+            # if is_link:
+            #     real_p = resolve(root, realpath)
+            #     if real_p:
+            #         this_p = p / name
+            #         graph_edge(file, f'"{this_p}"', f'"{real_p}"', 'constraint=false,arrowhead=normal,color=red')
+
+        for name in dirnames:
+            graph_node(file, p, ref, True, False, False, name, points)
+
+    for depth, (_, count) in points.items():
+        print('    {', file=file)
+        print('        rank=same', file=file)
+        for def_point in [point(depth, i + 1) for i in range(0, count)]:
+            print(f'        {def_point} [shape="point", width=0, height=0]', file=file)
+        print('    }', file=file)
+
+    print('}', file=file)
+
+
+if __name__ == '__main__':
+    arg_parser = ArgumentParser()
+    arg_parser.add_argument('--create', action='store_true')
+    arg_parser.add_argument('--clone', action='store_true')
+    arg_parser.add_argument('--graph', action='store_true')
+    arg_parser.add_argument('root', type=Path)
+    arg_parser.add_argument('command', nargs='*')
+    args = arg_parser.parse_args()
+
+    root = args.root.resolve()
+
+    if args.graph:
+        dot = 'tree.dot'
+        with open(dot, 'w') as file:
+            graph(root, file)
+        check_call(['dot', '-Tpng', dot, '-o', str(orig_cfg / 'tree.png')])
+    else:
+        isolated_env(args, root)

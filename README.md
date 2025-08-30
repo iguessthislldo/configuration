@@ -103,18 +103,10 @@ mv "$TEMP/settings.json" "$WINTERM_SETTINGS"
 
 ## Directory Structure
 
-- `data`: Used for `$DATA`, Linked as `$HOME\dat`
-    - `configuration`: Used for `$CONFIG`, Linked as `$HOME/cfg`
-        - `install_data.sh`
-        - `sh`
-        - `bin`
-        - `fonts`
-        - `ssh`
-        - `vim`
-        - `git`
-        - `tmux`
-        - `vim`
-        - `gnupg`
+Run `/isolated.py --create --clone isoenv true` and
+`./isolated.py isoenv --graph` to regenerate from committed. Requires Graphviz.
+
+![](tree.png)
 
 ## Usage
 

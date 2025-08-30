@@ -1,6 +1,7 @@
 /scraps
 /export-list
 /export.txz
+/tree.dot
 
 !/ssh/
 /ssh/*
