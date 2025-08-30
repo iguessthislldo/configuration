@@ -103,8 +103,8 @@ mv "$TEMP/settings.json" "$WINTERM_SETTINGS"
 
 ## Directory Structure
 
-Run `/isolated.py --create --clone isoenv true` and
-`./isolated.py isoenv --graph` to regenerate from committed. Requires Graphviz.
+Run `isolated.py --create --clone isoenv true` and
+`isolated.py isoenv --graph` to regenerate from committed. Requires Graphviz.
 
 ![](tree.png)
 
