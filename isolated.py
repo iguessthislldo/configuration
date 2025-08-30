@@ -77,7 +77,7 @@ def point(depth, i):
     return f'"p{depth}-{i}"'
 
 
-def graph_node(file, p, ref, is_dir, is_link, is_exec, name, points):
+def graph_node(file, p, ref, is_dir, is_link, is_exec, name, points, extra_label=''):
     this_p = p / name
     depth = len(this_p.parts) - 1
     prev_parent, count = points.get(depth, (p, 0))
@@ -94,16 +94,13 @@ def graph_node(file, p, ref, is_dir, is_link, is_exec, name, points):
     graph_edge(file, this_point, this_ref)
     points[depth] = (p, count)
     extra = ''
-    if is_dir:
-        if is_link:
-            extra = 'style=filled, color=royalblue1'
-        else:
-            extra = 'style=filled, color=orange1'
-    elif is_link:
+    if is_link:
         extra = 'style=filled, color=royalblue1'
+    elif is_dir:
+        extra = 'style=filled, color=orange1'
     elif is_exec:
         extra = 'style=filled, color=lightgreen'
-    graph_node_i(file, this_ref, is_dir, name, extra)
+    graph_node_i(file, this_ref, is_dir, name + extra_label, extra)
 
 
 def resolve(root, p):
@@ -113,14 +110,38 @@ def resolve(root, p):
     return Path('/') / rel
 
 
+dirnames_ignore_contents = [
+    'fontconfig',
+    'flox',
+    'bin',
+    'misc-setup',
+    'vim',
+    'environment.d',
+    'rc.d',
+    'oh-my-zsh',
+]
+
+
+def ignore_dir_contents(path):
+    return (path / '.git').is_file() or path.name in dirnames_ignore_contents
+
+
 def graph_filter(dirpath, dirnames, filenames):
-    if '.git' in filenames or dirpath.name in ['fontconfig', 'flox']:
+    if ignore_dir_contents(dirpath):
         # Submodule or something else we shouldn't show contents at all
         dirnames.clear()
         filenames.clear()
     else:
         # Ignore these names in directories
-        for name in ['.git', '.github', '.install_this.sh', '.gitignore', '.gitmodules']:
+        ignore_names = [
+            '.git',
+            '.github',
+            '.install_this.sh',
+            '.gitignore',
+            '.gitmodules',
+            'README.md',
+        ]
+        for name in ignore_names:
             if name in dirnames:
                 dirnames.remove(name)
             if name in filenames:
@@ -151,15 +172,20 @@ def graph(root, file):
             is_link = path != realpath
             is_dir = realpath.is_dir()
             is_exec = not is_dir and os.access(realpath, os.X_OK)
-            graph_node(file, p, ref, is_dir, is_link, is_exec, name, points)
-            # if is_link:
-            #     real_p = resolve(root, realpath)
-            #     if real_p:
-            #         this_p = p / name
-            #         graph_edge(file, f'"{this_p}"', f'"{real_p}"', 'constraint=false,arrowhead=normal,color=red')
+            extra_label = ''
+            if is_link:
+                real_p = resolve(root, realpath)
+                if real_p:
+                    extra_label = f' ({real_p})'
+                    # this_p = p / name
+                    # graph_edge(file, f'"{this_p}"', f'"{real_p}"', 'constraint=false,arrowhead=normal,color=red')
+            graph_node(file, p, ref, is_dir, is_link, is_exec, name, points, extra_label)
 
         for name in dirnames:
-            graph_node(file, p, ref, True, False, False, name, points)
+            extra_label = ''
+            if ignore_dir_contents(dirpath / name):
+                extra_label = ' (ignored contents)'
+            graph_node(file, p, ref, True, False, False, name, points, extra_label)
 
     for depth, (_, count) in points.items():
         print('    {', file=file)
