@@ -82,6 +82,7 @@ then
 fi
 set_var install_xdg_data_home path "$XDG_DATA_HOME"
 set_var install_user_dirs bool true
+set_var skip_set_ssh_origin bool false
 
 subscript=".install_this.sh"
 install_config=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -315,6 +316,10 @@ function action_install {
 
     # If we can ssh to the repo, set the origin of the configuration repo to
     # use ssh.
+    if $skip_set_ssh_origin
+    then
+        return
+    fi
     ssh_to=git@github.com
     ssh -qT $ssh_to || ssh_status=$?
     if [ $ssh_status -ne 255 ]

@@ -32,6 +32,7 @@ class Env:
 if __name__ == '__main__':
     arg_parser = ArgumentParser()
     arg_parser.add_argument('--create', action='store_true')
+    arg_parser.add_argument('--clone', action='store_true')
     arg_parser.add_argument('root', type=Path)
     arg_parser.add_argument('command', nargs='+')
     args = arg_parser.parse_args()
@@ -48,12 +49,16 @@ if __name__ == '__main__':
         env.home.mkdir()
         install_data = root / 'data'
         install_data.mkdir()
-        install_config = install_data / 'configuration'
-        check_call(['git', 'clone', '--recursive', str(orig_cfg), str(install_config)])
+        if args.clone:
+            install_config = install_data / 'configuration'
+            check_call(['git', 'clone', '--recursive', str(orig_cfg), str(install_config)])
+        else:
+            install_config = orig_cfg
 
         env.run('bash', 'install_data.sh',
             cwd=install_config,
             install_data=str(install_data),
+            skip_set_ssh_origin='true',
         )
 
     elif not root.exists():
