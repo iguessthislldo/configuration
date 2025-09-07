@@ -18,8 +18,9 @@ then
         echo "export MSYS=\"$MSYS\"" >> "$temp_file"
     fi
     echo "source \"\$CONFIG/sh/environment.sh\"" >> "$temp_file"
-    InstallFile "$temp_file" .zprofile
+    InstallFile "$temp_file" .zshenv
 fi
+InstallLink --file sh/profile.sh --home .zprofile
 InstallLink --file sh/rc.sh --home .zshrc
 
 # neovim

@@ -21,6 +21,10 @@ class Env:
             'HOME': str(home),
             'TERM': 'xterm-256color',
         }
+        inherit = {
+            'LANG': 'en_US.UTF-8',
+        }
+        self.vars.update({name: os.environ.get(name, default) for name, default in inherit.items()})
         self.vars.update(vars)
         self.cwd = cwd or home
 

@@ -1,3 +1,8 @@
+# This is always sourced first. On MSYS2, the PATH is the still the Windows
+# PATH so we can't use Unix programs, only the bash/zsh builtin functionality.
+# Because of MSYS2 we also can't set PATH here, because the system profile
+# overrides it.
+
 if [ -z ${ZSH_VERSION+x} ]
 then
     export IS_ZSH=false
@@ -113,13 +118,6 @@ then
     fi
 fi
 
-function igtd_add_to_path {
-    if [[ ":$PATH:" != *":$1:"* ]]
-    then
-        export PATH="$1:$PATH"
-    fi
-}
-
 source "$CONFIG/sh/igtd_sh_loader.sh"
 function igtd_sh_source_config {
     if $IS_ZSH
@@ -154,4 +152,4 @@ function igtd_sh_source_config {
 }
 igtd_sh_source_config
 igtd_sh_loader "$CONFIG/sh/environment.d"
-unset -f igtd_sh_source_config igtd_sh_loader igtd_add_to_path
+unset -f igtd_sh_source_config igtd_sh_loader
