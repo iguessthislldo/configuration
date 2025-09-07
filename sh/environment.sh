@@ -19,7 +19,7 @@ then
 fi
 
 function igtd_time_now {
-    echo $(($(date +%s%N)/1000000))
+    printf "%d\n" $(($(printf "%.3f\n" $EPOCHREALTIME) * 1000))
 }
 
 function igtd_print_time {
