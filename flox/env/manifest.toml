@@ -24,6 +24,7 @@ git.pkg-path = "git"
 tree.pkg-path = "tree"
 fzf.pkg-path = "fzf"
 tldr.pkg-path = "tldr"
+uv.pkg-path = "uv"
 # gum.pkg-path = "gum"
 # gum.version = "^0.14.5"
 
