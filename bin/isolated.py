@@ -20,6 +20,7 @@ class Env:
             'USER': user,
             'HOME': str(home),
             'TERM': 'xterm-256color',
+            'IGTD_ENV_NAME': 'isoenv',
         }
         inherit = {
             'LANG': 'en_US.UTF-8',

@@ -3,6 +3,8 @@
 # Because of MSYS2 we also can't set PATH here, because the system profile
 # overrides it.
 
+# Detect Shell ================================================================
+
 if [ -z ${ZSH_VERSION+x} ]
 then
     export IS_ZSH=false
@@ -22,6 +24,8 @@ then
     # Provide EPOCHREALTIME
     zmodload zsh/datetime
 fi
+
+# Exec Time Helpers ===========================================================
 
 function igtd_time_now {
     printf "%d\n" $(($(printf "%.3f\n" $EPOCHREALTIME) * 1000))
@@ -51,31 +55,37 @@ function igtd_humanize_millsec {
     igtd_print_time millisecond $((total_milliseconds%1000)) ''
 }
 
+# Display rough startup time
 IGTD_CMD_TIME_BEGIN=$(igtd_time_now)
 
-if [ -z ${DATA+x} ]
-then
-    export DATA=/data
-fi
+# Utils =======================================================================
 
-if [ -z ${CONFIG+x} ]
-then
-    export CONFIG=$DATA/configuration
-fi
-
-if [ -z ${XDG_CONFIG_HOME+x} ]
-then
-    export XDG_CONFIG_HOME="$IGTD_XDG_CONFIG_HOME"
-fi
-
-if [ -z ${XDG_DATA_HOME+x} ]
-then
-    export XDG_DATA_HOME="$IGTD_XDG_DATA_HOME"
-fi
+function igtd_add_env_name {
+    export IGTD_ENV_NAME="$1${IGTD_ENV_NAME+, ${IGTD_ENV_NAME}}"
+}
 
 function igtd_defined {
     eval "[ ! -z \${$1+x} ]"
 }
+
+function igtd_export_new {
+    local name="$1"
+    local default="$2"
+    if ! igtd_defined "$name"
+    then
+        # echo "$name=$default"
+        eval "export \"$name\"=\"$default\""
+    fi
+}
+
+# Basic Env Vars ==============================================================
+
+igtd_export_new DATA /data
+igtd_export_new CONFIG "$DATA/configuration"
+igtd_export_new XDG_CONFIG_HOME "$IGTD_XDG_CONFIG_HOME"
+igtd_export_new XDG_DATA_HOME "$IGTD_XDG_DATA_HOME"
+
+# Detect OS ===================================================================
 
 read IGTD_PROC_VERSION < /proc/version
 
@@ -95,6 +105,8 @@ function igtd_proc_version_has {
 igtd_proc_version_has IGTD_LINUX '[Ll]inux'
 igtd_proc_version_has IGTD_WSL '[Mm]icrosoft.*WSL2'
 igtd_proc_version_has IGTD_MSYS2 'MINGW64_NT'
+
+# Get Machine ID ==============================================================
 
 if [ -f $CONFIG/machine_id.local.sh ]
 then
@@ -117,6 +129,8 @@ then
         echo "Couldn't get something for IGTD_MACHINE_ID, using \"$IGTD_MACHINE_ID\""
     fi
 fi
+
+# Source Per-machine Config and environment.d =================================
 
 source "$CONFIG/sh/igtd_sh_loader.sh"
 function igtd_sh_source_config {
