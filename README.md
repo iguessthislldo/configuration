@@ -73,7 +73,6 @@ Run scripts in `misc-setup` as needed.
 
 - **NEEDS MORE WORK**
     - neovim config is broken
-    - zsh is broken until a nested shell is started
     - Need to apply workaround in https://github.com/airblade/vim-gitgutter/pull/905
     - Figure out what's broken in shortcut based setup vs native symlinks
     - Setup wezterm?

@@ -18,7 +18,7 @@ then
         echo "export MSYS=\"$MSYS\"" >> "$temp_file"
     fi
     echo "source \"\$CONFIG/sh/environment.sh\"" >> "$temp_file"
-    InstallFile "$temp_file" .zshenv
+    InstallFile "$temp_file" .zprofile
 fi
 InstallLink --file sh/rc.sh --home .zshrc
 
