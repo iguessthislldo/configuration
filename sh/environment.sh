@@ -1,3 +1,23 @@
+if [ -z ${ZSH_VERSION+x} ]
+then
+    export IS_ZSH=false
+else
+    export IS_ZSH=true
+fi
+
+if [ -z ${BASH_VERSION+x} ]
+then
+    export IS_BASH=false
+else
+    export IS_BASH=true
+fi
+
+if $IS_ZSH
+then
+    # Provide EPOCHREALTIME
+    zmodload zsh/datetime
+fi
+
 function igtd_time_now {
     echo $(($(date +%s%N)/1000000))
 }
@@ -26,7 +46,6 @@ function igtd_humanize_millsec {
     igtd_print_time millisecond $((total_milliseconds%1000)) ''
 }
 
-
 IGTD_CMD_TIME_BEGIN=$(igtd_time_now)
 
 if [ -z ${DATA+x} ]
@@ -49,39 +68,28 @@ then
     export XDG_DATA_HOME="$IGTD_XDG_DATA_HOME"
 fi
 
-if [ -z ${ZSH_VERSION+x} ]
-then
-    export IS_ZSH=false
-else
-    export IS_ZSH=true
-fi
+function igtd_defined {
+    eval "[ ! -z \${$1+x} ]"
+}
 
-if [ -z ${BASH_VERSION+x} ]
-then
-    export IS_BASH=false
-else
-    export IS_BASH=true
-fi
+read IGTD_PROC_VERSION < /proc/version
 
-if [ -z ${IGTD_WSL+x} ]
-then
-    if [[ $(grep -i microsoft /proc/version) ]]
+function igtd_proc_version_has {
+    local name="$1"
+    if igtd_defined $name
     then
-        export IGTD_WSL=true
-    else
-        export IGTD_WSL=false
+        return
     fi
-fi
+    local regex="$2"
+    local value
+    eval "[[ \$IGTD_PROC_VERSION =~ \$regex ]] && value=true || value=false"
+    # echo $name=$value
+    eval "export $name=$value"
+}
 
-if [ -z ${IGTD_MSYS2+x} ]
-then
-    if [[ $(grep MINGW64_NT /proc/version) ]]
-    then
-        export IGTD_MSYS2=true
-    else
-        export IGTD_MSYS2=false
-    fi
-fi
+igtd_proc_version_has IGTD_LINUX '[Ll]inux'
+igtd_proc_version_has IGTD_WSL '[Mm]icrosoft.*WSL2'
+igtd_proc_version_has IGTD_MSYS2 'MINGW64_NT'
 
 if [ -f $CONFIG/machine_id.local.sh ]
 then
@@ -91,7 +99,8 @@ if [ -z ${IGTD_MACHINE_ID+x} ]
 then
     if [ -f /etc/machine-id ]
     then
-        export IGTD_MACHINE_ID=$(cat /etc/machine-id)
+        read IGTD_MACHINE_ID < /etc/machine-id
+        export IGTD_MACHINE_ID
     elif [ -n "${HOST}" ]
     then
         export IGTD_MACHINE_ID="${HOST}"
@@ -113,15 +122,27 @@ function igtd_add_to_path {
 
 source "$CONFIG/sh/igtd_sh_loader.sh"
 function igtd_sh_source_config {
+    if $IS_ZSH
+    then
+        setopt null_glob
+    fi
+    if $IS_BASH
+    then
+        shopt -s nullglob
+    fi
+
     if [ -z ${IGTD_SH_LOADER_DEBUG+x} ]
     then
         local IGTD_SH_LOADER_DEBUG=false
     fi
 
     local f
-    for f in $(find $CONFIG/sh/ -name 'config-for-*')
+    local configs=($CONFIG/sh/config-for-*.sh)
+    for f in "${configs[@]}"
     do
-        if grep -q "# config for $IGTD_MACHINE_ID" $f
+        local line
+        read line < "$f"
+        if [ "$line" = "# config for $IGTD_MACHINE_ID" ]
         then
             if $IGTD_SH_LOADER_DEBUG
             then

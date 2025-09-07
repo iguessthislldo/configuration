@@ -1,4 +1,15 @@
 function igtd_sh_loader { # LOCATION
+    local dir="$1"
+
+    if $IS_ZSH
+    then
+        setopt null_glob
+    fi
+    if $IS_BASH
+    then
+        shopt -s nullglob
+    fi
+
     if [ -z ${IGTD_SH_LOADER_DEBUG+x} ]
     then
         local IGTD_SH_LOADER_DEBUG=false
@@ -9,22 +20,20 @@ function igtd_sh_loader { # LOCATION
         local IGTD_SH_LOADER_VERBOSE=false
     fi
 
-    local find_args=(-name '*.sh')
-
+    local -a files
     if $IS_ZSH
     then
-        find_args+=(-o -name '*.zsh')
+        files=($dir/*.{sh,zsh})
     fi
-
     if $IS_BASH
     then
-        find_args+=(-o -name '*.bash')
+        files=($dir/*.{sh,bash})
     fi
 
     local f
     local re_match
     local local_regex='\.local-for-(.*).*\.'
-    for f in $(find "$1" "${find_args[@]}" | sort)
+    for f in "${files[@]}"
     do
         if [[ $f =~ $local_regex ]]
         then
