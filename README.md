@@ -13,7 +13,7 @@ My framework for my configuration/dot files.
 | `install_xdg_config_home` | `$XDG_CONFIG_HOME` or else `$install_home/.config` | |
 | `install_xdg_data_home` | `$XDG_DATA_HOME` or else `$install_home/.local/share` | |
 | `install_user_dirs` | `true` | Create and link replacements for common home directories in `$install_data` |
-| `skip_set_ssh_origin` | `false` | Skip setting SSH origin for git repo |
+| `set_ssh_origin` | `true` | Set SSH origin for git repo |
 
 ### Linux Setup
 
@@ -168,5 +168,3 @@ Usage: `h DAYS`
 
 Print the shell history for the given number of days ago, which can be 0 for
 today.
-
-NOTE: Only works with zsh

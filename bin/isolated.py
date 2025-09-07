@@ -9,7 +9,7 @@ from pathlib import Path
 from textwrap import dedent
 
 
-orig_cfg = Path(__file__).parent.resolve()
+orig_cfg = Path(__file__).parent.parent.resolve()
 
 
 class Env:
@@ -50,7 +50,7 @@ def isolated_env(args, root):
         env.run('bash', 'install_data.sh',
             cwd=install_config,
             install_data=str(install_data),
-            skip_set_ssh_origin='true',
+            set_ssh_origin='false',
             install_user_dirs='false',
         )
 
