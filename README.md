@@ -72,33 +72,71 @@ Run scripts in `misc-setup` as needed.
 ### MSYS2 Setup
 
 - **NEEDS MORE WORK**
-    - neovim config is broken
-    - Need to apply workaround in https://github.com/airblade/vim-gitgutter/pull/905
-    - Figure out what's broken in shortcut based setup vs native symlinks
-    - Setup wezterm?
+    - Neovim:
+        - Does not work with shortcut-based links
+    - Git
+        - Git id after import isn't correct
+        - Line endings
 
 - [Install MSYS2](https://www.msys2.org/wiki/MSYS2-installation/)
-    - [Info on symlinks](https://www.msys2.org/docs/symlinks/)
-    - [Info on terminals](https://www.msys2.org/docs/terminals/)
+- Open MSYS2 UCRT64 Shell
+- Decide on symlink kind (**MSYS2 default is deep copy!**)
 
-```
-pacman -Syu
-pacman -S git zsh
-mkdir data
-cd data
-export install_data=$(realpath .)
-export install_xdg_config_home=$(cygpath --unix "$LOCALAPPDATA")
-export install_xdg_data_home=$(cygpath --unix "$LOCALAPPDATA")
-export install_user_dirs=false
-export MSYS=winsymlinks:lnk
-git clone --recurse-submodules https://github.com/iguessthislldo/configuration
-pacman -S - < msys2-packages.txt
-bash install_data.sh
-WINTERM_SETTINGS="$LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-cp "$WINTERM_SETTINGS" "$WINTERM_SETTINGS.backup"
-jq --slurpfile p msys2-win-term-profile.json '.profiles.list += $p | .defaultProfile = $p[0].guid' "$WINTERM_SETTINGS" > "$TEMP/settings.json"
-mv "$TEMP/settings.json" "$WINTERM_SETTINGS"
-```
+  See [more info on symlinks](https://www.msys2.org/docs/symlinks/).
+
+  - Native-based:
+    - Windows needs to be put into "devleoper mode" (requires admin) to enable native links.
+    - `export MSYS=winsymlinks:lnk`
+  - Shortcut-based:
+    - Works in explorer, but kludgy, and doesn't work sometimes (neovim).
+    - `export MSYS=winsymlinks:nativestrict`
+- Update and install essentials:
+
+  ```shell
+  pacman -Syu
+  pacman -S --needed git zsh
+  ```
+- Create a `data` directory:
+
+  ```shell
+  mkdir data
+  cd data
+  export install_data=$(realpath .)
+  ```
+- Place/clone this repository at `data/configuration`:
+
+  ```shell
+  git clone --recurse-submodules https://github.com/iguessthislldo/configuration
+  cd configuration
+  ```
+- Install list of packages:
+
+  ```shell
+  pacman -S --needed - < msys2-packages.txt
+  ```
+- Set remaining values and run `install_data.sh` until it succeeds.
+
+  ```shell
+  export install_xdg_config_home=$(cygpath --unix "$LOCALAPPDATA")
+  export install_xdg_data_home=$(cygpath --unix "$LOCALAPPDATA")
+  export install_user_dirs=false
+  bash install_data.sh
+  ```
+
+- Decide on terminal:
+
+  See [more info on terminals](https://www.msys2.org/docs/terminals/)
+
+  - Bundled Mintty:
+
+    Works, but it doesn't have the nerd font unless installed and selected, so fonts are broken.
+
+  - Windows Terminal:
+    - Fonts also broken out of the box.
+      - Run `misc-setup/set-msys2-win-term-profile.sh`
+
+  - WezTerm:
+    - TODO: Setup
 
 ## Directory Structure
 
