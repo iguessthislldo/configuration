@@ -35,6 +35,31 @@ function defined_to_var {
     if_to_var ! -z ${name_ref+x}
 }
 
+function paths_are_same {
+    a=$(readlink -f $1)
+    b=$(readlink -f $2)
+    test $a -ef $b
+    return $?
+}
+
+function ask {
+    if ${GITHUB_ACTIONS:-false}
+    then
+        echo "${@}? (Assuming yes because GitHub Actions)"
+        return
+    fi
+    while true; do
+        read -p "${@}? " yn
+        case $yn in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            * ) error "Please answer y(es) or n(o).";;
+        esac
+    done
+}
+
+save_vars=()
+
 function set_var {
     local name=$1
     local defined=`defined_to_var $name`
@@ -60,6 +85,7 @@ function set_var {
             fi
             ;;
     esac
+    save_vars+=($name)
     if $defined
     then
         echo "$type $name=$value"
@@ -69,7 +95,19 @@ function set_var {
     ref="$value"
 }
 
-set_var install_data path "/data"
+install_config=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+install_config=`realpath "$install_config"`
+saved_vars="$install_config/install_saved_vars.sh"
+if [ -f "$saved_vars" ]
+then
+    source "$saved_vars"
+fi
+
+if [ -z ${DATA+x} ]
+then
+    export DATA="/data"
+fi
+set_var install_data path "$DATA"
 set_var install_home path "$HOME"
 if [ -z ${XDG_CONFIG_HOME+x} ]
 then
@@ -85,8 +123,6 @@ set_var install_user_dirs bool true
 set_var set_ssh_origin bool true
 
 subscript=".install_this.sh"
-install_config=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-install_config=`realpath "$install_config"`
 echo "install_config=$install_config"
 export_list="$(realpath -s "$install_config/export-list")"
 export_file="export.txz"
@@ -106,32 +142,20 @@ then
     else
         fatal_error "MSYS must have winsymlinks:nativestrict or winsymlinks:lnk"
     fi
+    save_vars+=(MSYS)
+    echo "MSYS=$MSYS"
 fi
 
-function paths_are_same {
-    a=$(readlink -f $1)
-    b=$(readlink -f $2)
-    test $a -ef $b
-    return $?
-}
+echo '#' > "$saved_vars"
+for var in ${save_vars[@]}
+do
+    echo $(eval "echo export $var=\$$var") >> "$saved_vars"
+done
 
-function ask {
-    if ${GITHUB_ACTIONS:-false}
-    then
-        echo "${@}? (Assuming yes because GitHub Actions)"
-        return
-    fi
-    while true; do
-        read -p "${@}? " yn
-        case $yn in
-            [Yy]* ) return 0;;
-            [Nn]* ) return 1;;
-            * ) error "Please answer y(es) or n(o).";;
-        esac
-    done
-}
-
-ask "Does it look good? Continue"
+if ! ask "Does it look good? Continue"
+then
+    fatal_error "alright, edit the install_saved_vars.sh file"
+fi
 
 function InstallRun {
     if ! $doing_install
