@@ -56,7 +56,7 @@ def isolated_env(args, root):
             cwd=install_config,
             install_data=str(install_data),
             set_ssh_origin='false',
-            install_user_dirs='false',
+            install_user_dirs='true',
         )
 
     elif not root.exists():
@@ -100,12 +100,80 @@ def graph_node(file, p, ref, is_dir, is_link, is_exec, name, points, extra_label
     points[depth] = (p, count)
     extra = ''
     if is_link:
-        extra = 'style=filled, color=royalblue1'
+        if is_dir:
+            extra = 'color=black, style=filled, fillcolor=royalblue3'
+        else:
+            extra = 'color=black, style=filled, fillcolor=turquoise'
     elif is_dir:
-        extra = 'style=filled, color=orange1'
+        extra = 'color=black, style=filled, fillcolor=orange1'
     elif is_exec:
-        extra = 'style=filled, color=lightgreen'
+        extra = 'color=black, style=filled, fillcolor=lightgreen'
     graph_node_i(file, this_ref, is_dir, name + extra_label, extra)
+
+
+def read_graph_file(dir_path, ignore, always_graph):
+    graph_path = dir_path / '.graph'
+    if graph_path.exists():
+        with graph_path.open() as f:
+            for line in f:
+                line = line.strip()
+                if len(line) > 2:
+                    what = None
+                    values = line.split(':', 1)
+                    if len(values) > 1:
+                        what = values[0]
+                        path = (dir_path / values[1]).absolute()
+                    if what == 'ignore':
+                        ignore.add(path)
+                    elif what == 'graph':
+                        always_graph.add(path.resolve())
+                    else:
+                        print(f'Invalid .graph line in {graph_path}:', line)
+
+
+def all_ancestors(root, paths, all_paths):
+    for path in paths:
+        for ancestor in path.parents:
+            if ancestor == root.parent:
+                break
+            all_paths.add(ancestor)
+        all_paths.add(path)
+
+
+def interested_walk(root):
+    links = {}
+    ignore = set()
+    always_graph = set()
+
+    for current_dir, dirs, files in root.walk():
+        read_graph_file(current_dir, ignore, always_graph)
+        for name in dirs + files:
+            child = current_dir / name
+            if child in ignore or (child / '.git').is_file() or name == '.git':
+                if child.is_dir():
+                    dirs.remove(name)
+                continue
+            if child.is_symlink():
+                try:
+                    links[child.absolute()] = child.resolve(strict=True)
+                except FileNotFoundError:
+                    print(f'{child} is broken!')
+
+    all_paths = set()
+    all_ancestors(root, links.keys(), all_paths)
+    all_ancestors(root, links.values(), all_paths)
+    all_ancestors(root, always_graph, all_paths)
+
+    result = []
+    for current, dirs, files in root.walk():
+        if current not in all_paths:
+            continue
+        kept_dirs = [d for d in dirs if (current / d) in all_paths]
+        kept_files = [f for f in files if (current / f) in all_paths]
+        if kept_dirs or kept_files or current in all_paths:
+            result.append((current, kept_dirs, kept_files))
+
+    return result
 
 
 def resolve(root, p):
@@ -113,44 +181,6 @@ def resolve(root, p):
     if rel.parts and rel.parts[0] == '..':
         return None
     return Path('/') / rel
-
-
-dirnames_ignore_contents = [
-    'fontconfig',
-    'flox',
-    'bin',
-    'misc-setup',
-    'vim',
-    'environment.d',
-    'rc.d',
-    'oh-my-zsh',
-]
-
-
-def ignore_dir_contents(path):
-    return (path / '.git').is_file() or path.name in dirnames_ignore_contents
-
-
-def graph_filter(dirpath, dirnames, filenames):
-    if ignore_dir_contents(dirpath):
-        # Submodule or something else we shouldn't show contents at all
-        dirnames.clear()
-        filenames.clear()
-    else:
-        # Ignore these names in directories
-        ignore_names = [
-            '.git',
-            '.github',
-            '.install_this.sh',
-            '.gitignore',
-            '.gitmodules',
-            'README.md',
-        ]
-        for name in ignore_names:
-            if name in dirnames:
-                dirnames.remove(name)
-            if name in filenames:
-                filenames.remove(name)
 
 
 def graph(root, file):
@@ -165,9 +195,7 @@ def graph(root, file):
     p = Path("/")
     ref = f'"{p}"'
     graph_node_i(file, ref, True, str(p))
-    for dirpath, dirnames, filenames in root.walk():
-        graph_filter(dirpath, dirnames, filenames)
-
+    for dirpath, dirnames, filenames in interested_walk(root):
         p = resolve(root, dirpath)
         ref = f'"{p}"'
 
@@ -188,8 +216,6 @@ def graph(root, file):
 
         for name in dirnames:
             extra_label = ''
-            if ignore_dir_contents(dirpath / name):
-                extra_label = ' (ignored contents)'
             graph_node(file, p, ref, True, False, False, name, points, extra_label)
 
     for depth, (_, count) in points.items():

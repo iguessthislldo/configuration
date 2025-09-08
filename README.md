@@ -138,7 +138,7 @@ Run scripts in `misc-setup` as needed.
   - WezTerm:
     - TODO: Setup
 
-## Directory Structure
+## Example Directory Structure After Install
 
 Run `isolated.py --create --clone isoenv true` and
 `isolated.py isoenv --graph` to regenerate from committed. Requires Graphviz.

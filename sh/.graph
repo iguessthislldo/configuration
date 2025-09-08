@@ -1,0 +1,6 @@
+ignore:oh-my-zsh
+graph:environment.d
+graph:environment.sh
+graph:profile.sh
+graph:rc.d
+graph:rc.sh
