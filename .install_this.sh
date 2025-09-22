@@ -23,7 +23,12 @@ fi
 InstallLink --file sh/profile.sh --home .zprofile
 InstallLink --file sh/rc.sh --home .zshrc
 
-InstallLink --file vim --xdg nvim
+if $doing_install && $shortcut_based_msys2
+    # Workaround neovim not reading shortcut symlinks
+    cp -r vim $install_xdg_config_home/nvim
+else
+    InstallLink --file vim --xdg nvim
+fi
 
 InstallLink --file ptpython.py --xdg ptpython/config.py
 
@@ -31,16 +36,11 @@ InstallLink --file tmux --home .tmux.conf
 
 InstallLink --file gdb --xdg gdb
 
-InstallLink --file wezterm --xdg wezterm
 if $doing_install && $msys2
 then
-    cp wezterm/wezterm.lua $(cygpath --homeroot)/$USER/.wezterm.lua
-
-    # Workaround neovim not reading shortcut symlinks
-    if $shortcut_based_msys2
-    then
-        cp -r vim $install_xdg_config_home/nvim
-    fi
+    cp wezterm/wezterm.lua "$(cygpath --homeroot)/$USER/.wezterm.lua"
+else
+    InstallLink --file wezterm --xdg wezterm
 fi
 
 if $install_user_dirs
