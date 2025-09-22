@@ -8,12 +8,15 @@ My framework for my configuration/dot files.
 
 | Name | Default | Description |
 | --- | --- | --- |
-| `install_data` | `/data` | |
+| `install_data` | `$DATA` or `/data` | |
 | `install_home` | `$HOME` | |
 | `install_xdg_config_home` | `$XDG_CONFIG_HOME` or else `$install_home/.config` | |
 | `install_xdg_data_home` | `$XDG_DATA_HOME` or else `$install_home/.local/share` | |
 | `install_user_dirs` | `true` | Create and link replacements for common home directories in `$install_data` |
 | `set_ssh_origin` | `true` | Set SSH origin for git repo |
+| `MSYS` | N/A | See below |
+
+These are saved to `install_saved_vars.sh`.
 
 ### Linux Setup
 
@@ -77,25 +80,31 @@ Run scripts in `misc-setup` as needed.
     - Git
         - Git id after import isn't correct
         - Line endings
+    - Something to check if `msys2-packages.txt` changed and offer to install
+      or remove them automatically would be nice.
 
 - [Install MSYS2](https://www.msys2.org/wiki/MSYS2-installation/)
 - Open MSYS2 UCRT64 Shell
-- Decide on symlink kind (**MSYS2 default is deep copy!**)
+- Decide on symlink kind (**MSYS2 default is deep copy!**):
 
   See [more info on symlinks](https://www.msys2.org/docs/symlinks/).
 
   - Native-based:
-    - Windows needs to be put into "devleoper mode" (requires admin) to enable native links.
-    - `export MSYS=winsymlinks:lnk`
-  - Shortcut-based:
-    - Works in explorer, but kludgy, and doesn't work sometimes (neovim).
+    - Windows needs to be put into "developer mode" (requires admin) to enable native links.
     - `export MSYS=winsymlinks:nativestrict`
+  - Shortcut-based:
+    - Works in explorer, but kinda a kludge, and doesn't work sometimes (neovim).
+    - `export MSYS=winsymlinks:lnk`
 - Update and install essentials:
 
   ```shell
   pacman -Syu
   pacman -S --needed git zsh
   ```
+
+  Might need to [export a certificate for MSYS2 to use](
+  https://stackoverflow.com/questions/69348953/certificate-error-when-trying-to-install-msys2-packages-on-windows-server)
+  on cooperate network. Might need to rename the certificate after exporting.
 - Create a `data` directory:
 
   ```shell
@@ -122,20 +131,17 @@ Run scripts in `misc-setup` as needed.
   export install_user_dirs=false
   bash install_data.sh
   ```
-
 - Decide on terminal:
 
   See [more info on terminals](https://www.msys2.org/docs/terminals/)
 
   - Bundled Mintty:
-
-    Works, but it doesn't have the nerd font unless installed and selected, so fonts are broken.
-
+    - Works, but it doesn't have the nerd font unless installed and selected, so fonts are broken.
   - Windows Terminal:
-    - Fonts also broken out of the box.
-      - Run `misc-setup/set-msys2-win-term-profile.sh`
-
+    - Also no nerd font out of the box.
+    - Run `misc-setup/set-msys2-win-term-profile.sh`
   - WezTerm:
+    - Has nerd font builtin.
     - TODO: Setup
 
 ## Example Directory Structure After Install
@@ -149,8 +155,7 @@ Run `isolated.py --create --clone isoenv true` and
 
 ### Aliases and Scripts Added to `PATH`
 
-This doesn't include `sh/rc.d/50_aliases.sh` or aliases added by oh-my-zsh in
-`sh/rc.d/00_oh-my-zsh.zsh`.
+This doesn't include `sh/rc.d/50_aliases.sh` or aliases added by oh-my-zsh.
 
 #### `u`
 

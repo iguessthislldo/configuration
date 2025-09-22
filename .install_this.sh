@@ -23,15 +23,15 @@ fi
 InstallLink --file sh/profile.sh --home .zprofile
 InstallLink --file sh/rc.sh --home .zshrc
 
-# neovim
 InstallLink --file vim --xdg nvim
 
-# ptpython
 InstallLink --file ptpython.py --xdg ptpython/config.py
 
 InstallLink --file tmux --home .tmux.conf
 
 InstallLink --file gdb --xdg gdb
+
+InstallLink --file wezterm --xdg wezterm
 
 if $install_user_dirs
 then
