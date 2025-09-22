@@ -34,7 +34,7 @@ InstallLink --file gdb --xdg gdb
 InstallLink --file wezterm --xdg wezterm
 if $doing_install && $msys2
 then
-    cp wezterm/wezterm.lua $(cygpath --homeroot)/.wezterm.lua
+    cp wezterm/wezterm.lua $(cygpath --homeroot)/$USER/.wezterm.lua
 
     # Workaround neovim not reading shortcut symlinks
     if $shortcut_based_msys2
