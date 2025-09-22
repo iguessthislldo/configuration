@@ -32,6 +32,16 @@ InstallLink --file tmux --home .tmux.conf
 InstallLink --file gdb --xdg gdb
 
 InstallLink --file wezterm --xdg wezterm
+if $doing_install && $msys2
+then
+    cp wezterm/wezterm.lua $(cygpath --homeroot)/.wezterm.lua
+
+    # Workaround neovim not reading shortcut symlinks
+    if $shortcut_based_msys2
+    then
+        cp -r vim $install_xdg_config_home/nvim
+    fi
+fi
 
 if $install_user_dirs
 then

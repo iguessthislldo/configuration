@@ -129,16 +129,20 @@ export_file="export.txz"
 export_path="$(realpath -s "$install_config/$export_file")"
 doing_export=false
 doing_install=false
+msys2=false
+shortcut_based_msys2=false
 
 if [[ $(grep MINGW64_NT /proc/version) ]]
 then
     echo This is MSYS2
+    msys2=true
     if [[ "$MSYS" == *"winsymlinks:nativestrict"* ]]
     then
         echo "Using native links"
     elif [[ "$MSYS" == *"winsymlinks:lnk"* ]]
     then
         echo "Using shortcut-based links"
+        shortcut_based_msys2=true
     else
         fatal_error "MSYS must have winsymlinks:nativestrict or winsymlinks:lnk"
     fi

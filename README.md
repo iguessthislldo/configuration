@@ -142,7 +142,7 @@ Run scripts in `misc-setup` as needed.
     - Run `misc-setup/set-msys2-win-term-profile.sh`
   - WezTerm:
     - Has nerd font builtin.
-    - TODO: Setup
+    - Download [WezTerm](https://wezterm.org/).
 
 ## Example Directory Structure After Install
 
