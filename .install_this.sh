@@ -24,6 +24,7 @@ InstallLink --file sh/profile.sh --home .zprofile
 InstallLink --file sh/rc.sh --home .zshrc
 
 if $doing_install && $shortcut_based_msys2
+then
     # Workaround neovim not reading shortcut symlinks
     cp -r vim $install_xdg_config_home/nvim
 else
