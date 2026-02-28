@@ -38,6 +38,9 @@ else
     Plug 'iguessthislldo/vim-opendds'
 endif
 
+" Local plugins
+Plug g:vim_home . '/rst-header.vim'
+
 call plug#end()
 
 set completeopt=menu,menuone,noselect

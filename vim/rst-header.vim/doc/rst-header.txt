@@ -1,0 +1,174 @@
+*rst-header.txt*  Manipulate reStructuredText headers      *rst-header*
+
+==============================================================================
+CONTENTS                                                *rst-header-contents*
+
+    1. Introduction .......................... |rst-header-introduction|
+    2. Commands .............................. |rst-header-commands|
+    3. Mappings .............................. |rst-header-mappings|
+    4. Configuration ......................... |rst-header-configuration|
+    5. Header Hierarchy ...................... |rst-header-hierarchy|
+
+==============================================================================
+1. INTRODUCTION                                     *rst-header-introduction*
+
+rst-header.vim provides functions for manipulating reStructuredText section
+headers. It allows you to:
+
+- Shift headers up or down in the hierarchy
+- Set headers to a specific level
+- Fix mismatched underline/overline lengths
+- Auto-fix headers on |InsertLeave|
+
+The plugin automatically detects header context, so you can position your
+cursor anywhere on a header (title, overline, or underline) and the entire
+header will be affected.
+
+==============================================================================
+2. COMMANDS                                            *rst-header-commands*
+
+All commands accept a range and operate on the selected lines or current
+header context.
+
+                                                                *:RstHeader*
+:RstHeader {arg}
+    Main command for header manipulation. {arg} can be:
+
+    `up`        Move header(s) up one level in the hierarchy
+    `down`      Move header(s) down one level in the hierarchy
+    `fix`       Fix mismatched underline/overline lengths
+    `{char}`    Set header to specific level (e.g., `=`, `*`, `-`)
+
+    Append `!` for silent mode (no messages when nothing changes):
+    `:RstHeader fix!`
+
+                                                               *:RstHeaderN*
+:RstHeaderN {arg}
+    Normal mode wrapper that auto-detects the header context around the
+    cursor and applies the operation to the entire header.
+
+==============================================================================
+3. MAPPINGS                                            *rst-header-mappings*
+
+All mappings are buffer-local and only available in RST files.
+Default leader is `\` unless you've set |mapleader|.
+
+NORMAL MODE ~
+                                                        *rst-header-count*
+Shift header level: >
+    [count]<leader>ru   Shift up [count] levels (default 1)
+    [count]<leader>rd   Shift down [count] levels (default 1)
+<
+Fix header lengths: >
+    <leader>rf          Fix mismatched underline/overline lengths
+<
+Set specific level: >
+    <leader>r{char}     Set header to level {char}
+<
+Where {char} is any character from |g:rst_header_hierarchy|: >
+    <leader>r#          Set to # level (overlined)
+    <leader>r*          Set to * level (overlined)
+    <leader>r=          Set to = level
+    <leader>r-          Set to - level
+    <leader>r^          Set to ^ level
+    <leader>r"          Set to " level
+    <leader>r~          Set to ~ level
+<
+Examples: >
+    3<leader>rd         Shift header down 3 levels
+    <leader>r=          Make current line a === header
+<
+VISUAL MODE ~
+
+Same mappings as normal mode, but operate on the selected range.
+Useful for shifting multiple headers at once.
+
+==============================================================================
+4. CONFIGURATION                                  *rst-header-configuration*
+
+                                                    *g:rst_header_hierarchy*
+g:rst_header_hierarchy ~
+    List defining the header character hierarchy from highest to lowest
+    level. Characters at the start are "more important" headers.
+
+    Default: `['#', '*', '=', '-', '^', '"', '~']`
+
+    Example: Change hierarchy order >
+        let g:rst_header_hierarchy = ['=', '-', '~', '^']
+<
+                                                     *g:rst_header_overlined*
+g:rst_header_overlined ~
+    List of characters that use both overline and underline.
+    Other characters use underline only.
+
+    Default: `['#', '*']`
+
+    Example: Make `=` also use overlines >
+        let g:rst_header_overlined = ['#', '*', '=']
+<
+==============================================================================
+5. HEADER HIERARCHY                                   *rst-header-hierarchy*
+
+reStructuredText determines header levels by the order characters appear in
+a document. This plugin uses the standard hierarchy by default, but this can
+be configured.
+
+DEFAULT HIERARCHY ~
+
+    Level   Char    Style
+    -----   ----    -----
+    1       #       Overlined (####)
+    2       *       Overlined (****)
+    3       =       Underlined only
+    4       -       Underlined only
+    5       ^       Underlined only
+    6       "       Underlined only
+    7       ~       Underlined only
+
+OVERLINED VS UNDERLINED ~
+
+Overlined headers have adornment above and below: >
+    #############
+    Part Title
+    #############
+<
+Underlined headers have adornment below only: >
+    Section Title
+    =============
+<
+When shifting between overlined and underlined levels, the plugin
+automatically adds or removes the overline.
+
+AUTO-FIX ~
+
+The plugin automatically fixes header lengths on |InsertLeave|. This means
+you can type a header title and the underline will be adjusted to match.
+
+Before: >
+    My New Section Title
+    ===
+<
+After leaving insert mode: >
+    My New Section Title
+    ====================
+<
+EXAMPLES ~
+
+Starting with a plain line: >
+    My Section
+<
+Turn to level 3 header using `<leader>r=`: >
+    My Section
+    ==========
+<
+Shift header down to level 4 using `<leader>rd`: >
+    My Section
+    ----------
+<
+Shift header up to level 2 using `2<leader>ru` twice: >
+    **********
+    My Section
+    **********
+<
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
