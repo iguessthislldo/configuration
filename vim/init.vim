@@ -14,9 +14,6 @@ endfunction
 
 let g:vim_home = NativePath(fnamemodify(resolve(expand('<sfile>:p')), ':h'))
 
-let init_files = [
-    \ 'general', 'plugins', 'place', 'SwitchInclude', 'fill_line']
-
-for i in init_files
-    exec 'source ' . g:vim_home . '/' . i . '.vim'
+for init_file in sort(glob(g:vim_home . '/*.init.vim', 0, 1))
+    exec 'source ' . init_file
 endfor
