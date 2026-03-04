@@ -48,6 +48,11 @@ function ask {
         echo "${@}? (Assuming yes because GitHub Actions)"
         return
     fi
+    if [ ! -t 0 ]
+    then
+        echo "${@}? (Assuming yes because not running interactively)"
+        return
+    fi
     while true; do
         read -p "${@}? " yn
         case $yn in
@@ -125,6 +130,9 @@ saved_vars="$install_config/install_saved_vars.sh"
 if [ -f "$saved_vars" ]
 then
     source "$saved_vars"
+elif [ "$action" == "export" ] || [ "$action" == "import" ]
+then
+    fatal_error "$saved_vars not found. Run install first."
 fi
 
 if [ -z ${DATA+x} ]
@@ -180,7 +188,7 @@ do
     echo $(eval "echo export $var=\$$var") >> "$saved_vars"
 done
 
-if ! ask "Does it look good? Continue"
+if ! ask "Does it look good? (if not you can edit the install_saved_vars.sh file) Continue"
 then
     fatal_error "alright, edit the install_saved_vars.sh file"
 fi
@@ -370,11 +378,13 @@ function action_install {
     # use ssh.
     if $set_ssh_origin
     then
+        echo '==== Making sure git origin is SSH'
+        echo 'First checking if we can connect to GitHub...'
         ssh_to=git@github.com
         ssh -qT $ssh_to || ssh_status=$?
         if [ $ssh_status -ne 255 ]
         then
-            echo 'Making sure git origin is SSH'
+            echo 'Might be able to set the remote...'
             cd $install_config
             origin="$ssh_to:iguessthislldo/configuration.git"
             if [ "$(git remote get-url origin)" != "$origin" ]
