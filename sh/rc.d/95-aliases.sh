@@ -14,7 +14,14 @@ function alias-if {
     done
 }
 
-alias-if o xdg-open start
+if $IGTD_WSL; then
+    wsl-open() {
+        local target="$1"
+        [ -e "$target" ] && target="$(readlink -f "$target")"
+        powershell.exe -c Start "$(wslpath -w "$target")"
+    }
+fi
+alias-if o xdg-open wsl-open start
 alias-if p ptipython3 ipython python3 'py -3' python
 
 alias l="ls --color=always --classify --group-directories-first"
