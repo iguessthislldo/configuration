@@ -97,6 +97,30 @@ function set_var {
 
 install_config=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 install_config=`realpath "$install_config"`
+
+# Parse action first so we can skip initialization for help
+if [ "$#" == 0 ]
+then
+    action="install"
+else
+    action="$1"
+    shift
+fi
+
+case $action in
+    install | export | import)
+        ;;
+    help | "--help" | "-h")
+        echo "install_data.sh [install]"
+        echo "install_data.sh export"
+        echo "install_data.sh import [SSH_ARGS]"
+        exit 0
+        ;;
+    *)
+        fatal_error "Invalid action \"$action\""
+        ;;
+esac
+
 saved_vars="$install_config/install_saved_vars.sh"
 if [ -f "$saved_vars" ]
 then
@@ -388,14 +412,6 @@ function action_import {
     tar xf "$export_file"
 }
 
-if [ "$#" == 0 ]
-then
-    action="install"
-else
-    action="$1"
-    shift
-fi
-
 case $action in
     install)
         action_install
@@ -405,13 +421,5 @@ case $action in
         ;;
     import)
         action_import $@
-        ;;
-    help | "--help" | "-h")
-        echo "install_data.sh [install]"
-        echo "install_data.sh export"
-        echo "install_data.sh import [SSH_ARGS]"
-        ;;
-    *)
-        fatal_error "Invalid action \"$action\""
         ;;
 esac
