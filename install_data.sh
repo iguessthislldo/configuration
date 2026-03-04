@@ -392,6 +392,8 @@ function action_export {
 
     doing_export=true
     rm -f $export_list $export_path
+    # Remove the group and other perm bits for export list and export archive
+    umask 077
     cd $install_data
     Scan
     tar --create --xz --file $export_path --files-from $export_list
