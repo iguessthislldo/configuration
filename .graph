@@ -1,2 +1,4 @@
 graph:../../home/.zshenv
 graph:../../home/bin
+ignore:../../home/.cache/flox
+ignore:flox/run
