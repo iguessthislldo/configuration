@@ -9,7 +9,7 @@ set tags=./tags;/
 
 " Undo
 set undofile
-set undodir=~/cfg/vim/undo_dir
+let &undodir = g:vim_home . '/undo_dir'
 
 "Show Line Numbers
 set number
@@ -32,6 +32,19 @@ set hidden
 " Display Encoding Errors as Hex
 set display+=uhex
 
+" Move to the next or previous line
+set whichwrap+=<,>,h,l
+
+" Mark the 100th char column in the buffer
+let &colorcolumn=100
+
+" Tab is 4 Spaces
+set softtabstop=4 tabstop=4 shiftwidth=4 expandtab
+
+" Expand file search
+set path+=**
+set wildmenu
+
 " ================ Search ====================
 
 " Highlight search results
@@ -49,19 +62,6 @@ set incsearch
 " Folding
 setlocal foldmethod=syntax
 set nofoldenable
-
-" =============================================
-
-" Expand file search
-set path+=**
-set wildmenu
-
-" Auto wrap left or right
-set whichwrap+=<,>,h,l
-
-" let &colorcolumn=join(range(81,999),",")
-" Tab is 4 Spaces
-set softtabstop=4 tabstop=4 shiftwidth=4 expandtab
 
 " ================ C/C++ ====================
 
@@ -82,27 +82,20 @@ let c_space_errors = 1
 " Set Leader
 let mapleader = ","
 
-" Copy Paste from system keyboard
+" Copy Paste from system clipboard
 vnoremap <leader>y "+y
 nnoremap <leader>p "+p
 
 if !has('clipboard')
-   echom "WARNING: Can not use clipboard! (Missing xclip?)"
+    echom "WARNING: Can not use clipboard! (Missing xclip?)"
 endif
 
-" NO NOT AUTOINDENT UNLESS ENTER IS PRESSED
-autocmd BufReadPre,FileReadPre setlocal indentkeys=*<Return>
+" Do not autoindent unless enter is pressed
+augroup indent_on_enter
+    autocmd!
+    autocmd BufReadPre,FileReadPre * setlocal indentkeys=*<Return>
+augroup END
 
 " F12 Resync Syntax Highlighting
 noremap <F12> <Esc>:syntax sync fromstart<CR>
 inoremap <F12> <C-o>:syntax sync fromstart<CR>
-
-" augroup jinga_syntax
-"     autocmd!
-"     autocmd Syntax * syntax region Comment start="{{" end="}}" skip="'}}'"
-"     autocmd Syntax * echo('any syntax called')
-" augroup END
-" autocmd Syntax * syntax region Comment start="{{" end="}}" skip="'}}'"
-" syntax region Comment start="{%" end="%}"
-" syntax region Comment start="{#" end="#}"
-" Copy Paste from system keyboard
