@@ -413,6 +413,7 @@ endfunction
 " Normal mode wrapper - detects header context and calls RstHeader
 " Optional count parameter repeats the operation (for up/down)
 function! RstHeaderNormal(arg, ...)
+    let l:save_cursor = getcurpos()
     let l:count = a:0 > 0 ? a:1 : 1
     let l:range = s:DetectHeaderRange(line('.'))
     for i in range(l:count)
@@ -427,6 +428,7 @@ function! RstHeaderNormal(arg, ...)
             break
         endif
     endfor
+    call setpos('.', l:save_cursor)
 endfunction
 
 " Commands
