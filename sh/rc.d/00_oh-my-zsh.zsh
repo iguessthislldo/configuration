@@ -23,3 +23,7 @@ plugins=(
 export ZSH=$CONFIG/sh/oh-my-zsh/ohmyzsh
 ZSH_CACHE_DIR=$CONFIG/sh/oh-my-zsh/cache/${IGTD_MACHINE_ID}
 mkdir -p $ZSH_CACHE_DIR
+
+# Disable directories aliases (specfically the ls aliases)
+# Define 1-9 aliases ourselves
+zstyle ':omz:lib:directories' aliases no
