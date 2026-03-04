@@ -389,7 +389,7 @@ function action_install {
             origin="$ssh_to:iguessthislldo/configuration.git"
             if [ "$(git remote get-url origin)" != "$origin" ]
             then
-                git remote set-url origin $origin
+                git remote set-url origin $origin && echo "Done"
             else
                 echo "Already set to $origin"
             fi
