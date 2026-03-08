@@ -1,7 +1,7 @@
 function alias-if {
     local alias_name="$1"
     shift
-    while (( "$#" ))
+    while (( $# ))
     do
         local command="$1"
         shift
