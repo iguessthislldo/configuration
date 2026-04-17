@@ -31,13 +31,6 @@ Plug 'habamax/vim-rst'
 Plug 'scottmckendry/cyberdream.nvim'
 Plug 'folke/which-key.nvim'
 
-" Use local copy of vim-opendds, else download it
-if isdirectory(expand('$LOCAL_VIM_OPENDDS'))
-    Plug expand('$LOCAL_VIM_OPENDDS')
-else
-    Plug 'iguessthislldo/vim-opendds'
-endif
-
 " Local plugins
 Plug g:vim_home . '/rst-header.vim'
 
