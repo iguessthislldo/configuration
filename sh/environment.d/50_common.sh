@@ -13,6 +13,16 @@ then
     fi
 fi
 
+if [ -z ${IGTD_EDITOR_IS_NEOVIM+x} ]
+then
+    if [[ $EDITOR =~ 'nvim' ]]
+    then
+        export IGTD_EDITOR_IS_NEOVIM=true
+    else
+        export IGTD_EDITOR_IS_NEOVIM=false
+    fi
+fi
+
 if [ -z ${LANG+x} ]
 then
     export LANG=en_US.UTF-8

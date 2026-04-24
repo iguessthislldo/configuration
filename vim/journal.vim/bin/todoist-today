@@ -1,0 +1,50 @@
+#!/bin/bash
+# Filter todoist tasks to show only today and overdue items
+
+# Check if todoist command exists
+if ! command -v todoist &> /dev/null; then
+  echo "Error: todoist command not found"
+  exit 1
+fi
+
+# Sync todoist
+if ! todoist sync; then
+  echo "Error: todoist sync failed"
+  exit 1
+fi
+
+# List today and overdue tasks
+todoist --csv list | awk -F',' '
+NR == 1 { next }  # Skip header
+{
+  name = $NF  # Last field is the name
+  due = $3    # Third field is due date
+
+  # Parse due date: format is "YY/MM/DD(Day) HH:MM" or empty
+  if (due == "") {
+    # No due date - show it (inbox items)
+    print "- " name
+  } else {
+    # Extract YY/MM/DD part
+    due_date = substr(due, 1, 8)
+
+    # Convert YY/MM/DD to sortable format
+    split(due_date, parts, "/")
+    year = "20" parts[1]
+    month = parts[2]
+    day = parts[3]
+
+    due_iso = year "-" month "-" day
+
+    # Get today in ISO format
+    cmd = "date +%Y-%m-%d"
+    cmd | getline today
+    close(cmd)
+
+    # Show if due is today or earlier
+    if (due_iso <= today) {
+      print "- " name
+    }
+  }
+}
+'

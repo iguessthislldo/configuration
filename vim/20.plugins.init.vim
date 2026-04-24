@@ -32,7 +32,11 @@ Plug 'scottmckendry/cyberdream.nvim'
 Plug 'folke/which-key.nvim'
 
 " Local plugins
-Plug g:vim_home . '/rst-header.vim'
+for dir in sort(glob(g:vim_home . '/*.vim', 0, 1))
+    if isdirectory(dir)
+        Plug dir
+    endif
+endfor
 
 call plug#end()
 

@@ -42,3 +42,8 @@ alias 9='cd -9'
 
 alias gdiff="git diff --no-index"
 alias giff="gdiff"
+
+if $IGTD_EDITOR_IS_NEOVIM
+then
+    alias day="$EDITOR -c Day"
+fi
