@@ -26,6 +26,7 @@ fzf.pkg-path = "fzf"
 tldr.pkg-path = "tldr"
 uv.pkg-path = "uv"
 pikchr.pkg-path = "pikchr"
+todoist.pkg-path = "todoist"
 # gum.pkg-path = "gum"
 # gum.version = "^0.14.5"
 
