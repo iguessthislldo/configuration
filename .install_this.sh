@@ -49,4 +49,6 @@ then
     InstallLink --file user-dirs.dir --xdg user-dirs.dirs
 fi
 
+InstallLink --file mpd --xdg mpd
+
 Scan
