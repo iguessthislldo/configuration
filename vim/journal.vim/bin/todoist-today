@@ -16,6 +16,7 @@ fi
 # List today and overdue tasks
 todoist --csv list | awk -F',' '
 NR == 1 { next }  # Skip header
+$4 == "#Daily" { next }  # Skip Daily project
 {
   name = $NF  # Last field is the name
   due = $3    # Third field is due date
