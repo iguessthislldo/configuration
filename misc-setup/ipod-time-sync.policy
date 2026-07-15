@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!--
+To install:
+sudo apt install libgpod-common
+sudo install -D ipod-time-sync.policy /usr/share/polkit-1/actions/ipod-time-sync.policy
+
+To run:
+pkexec /usr/bin/ipod-time-sync
+-->
+<policyconfig>
+  <action id="ipod-time-sync">
+    <message>Sync iPod time</message>
+    <description>Allow syncing iPod system time</description>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>auth_self</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/ipod-time-sync</annotate>
+  </action>
+</policyconfig>
