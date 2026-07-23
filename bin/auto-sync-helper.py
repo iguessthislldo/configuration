@@ -24,6 +24,9 @@ gi.require_version('Vte', '3.91')
 
 from gi.repository import Gtk, Gio, GLib, Vte
 
+sys.path.insert(0, str(Path(__file__).parent.parent / 'lib'))
+from pyigtd.cli import Cli, cli_field
+
 
 app_name = 'auto-sync-helper'
 app_id = f'us.hornsey.{app_name}'
@@ -669,14 +672,19 @@ X-GNOME-Autostart-enabled=true
     print("\nInstallation complete!")
 
 
+@dataclass
+class CliApp(Cli):
+    '''
+    Monitor USB devices and sync files
+    '''
+
+    hide: bool = cli_field('--hide', '-H', help='Start hidden in background')
+    kill: bool = cli_field('--kill', '-K', help='Kill existing instance')
+    install: bool = cli_field('--install', help='Install desktop entries')
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Monitor USB devices and sync files")
-    parser.add_argument("--install", action="store_true", help="Install desktop entries")
-    parser.add_argument("--hide", "-H", action="store_true", help="Start hidden in background")
-    parser.add_argument("--kill", "-K", action="store_true", help="Kill existing instance")
-
-    args = parser.parse_args()
-
+    args = CliApp().parse_args()
     if args.install:
         install_desktop_entries()
     elif args.kill:

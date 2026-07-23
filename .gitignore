@@ -10,3 +10,5 @@
 !/ssh/.install_this.sh
 
 /control-gnome-displays.json
+
+__pycache__
