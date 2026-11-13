@@ -1,7 +1,17 @@
-# This is always sourced first. On MSYS2, the PATH is the still the Windows
-# PATH so we can't use Unix programs, only the bash/zsh builtin functionality.
-# Because of MSYS2 we also can't set PATH here, because the system profile
-# overrides it.
+# On MSYS2, the PATH is the still the Windows PATH so we can't use Unix
+# programs, only the bash/zsh builtin functionality. We can't also set the PATH
+# because it's going to be set in the system profile.
+#
+# Start up process:
+# -> environment.sh (All shells)
+#   -- environment.d/*
+# -- profile.sh (Login shells (once))
+# -- rc.sh (Interactive shells (multiple times))
+#   -- rc.d/*
+#
+# See here for a summary of the source order of zsh:
+#   https://isamert.net/2021/03/02/a-relatively-deep-dive-into-zsh-shell-login-process-without-a-display-manager-.html
+#   Also see "man zsh" then "/STARTUP"
 
 # Detect Shell ================================================================
 
