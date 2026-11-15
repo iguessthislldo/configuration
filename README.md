@@ -45,16 +45,16 @@ These are saved to `install_saved_vars.sh`.
 - Install [Flatpak](https://flathub.org/en/setup)
     - The system has to be restarted for Flatpak to work correctly, can do that
       after setting the default shell.
-    - `sync-flatpak.py`
-        - To use `sync-flatpak.py`, the libflatpak GI bindings are needed. On
+    - `sync-flatpak`
+        - To use `sync-flatpak`, the libflatpak GI bindings are needed. On
           Ubuntu/Debian these can be installed using `sudo apt install gir1.2-flatpak-1.0`
-        - Use `sync-flatpak.py list` to see the groups and apps
-        - Use `sync-flatpak.py sync` to install all the default apps and
-          `sync-flatpak.py sync --add-groups <group1>,<group2>,...` to include
+        - Use `sync-flatpak list` to see the groups and apps
+        - Use `sync-flatpak sync` to install all the default apps and
+          `sync-flatpak sync --add-groups <group1>,<group2>,...` to include
           optional groups and install the apps
-        - Use `sync-flatpak.py export <app>...` export apps from an existing
+        - Use `sync-flatpak export <app>...` export apps from an existing
           system, copy `export-flatpak-data.txz` to the new system, and
-          run `sync-flatpak.py import` to import on the new system.
+          run `sync-flatpak import` to import on the new system.
 - Set Zsh as the default shell, for example: `chsh -s /usr/bin/zsh`
 - At this point now or later we can either run `zsh` manually or relogin to
   have it take its place as the default shell.
