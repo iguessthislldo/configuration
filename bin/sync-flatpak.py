@@ -206,13 +206,21 @@ class LocalConfig:
         self.path = synced_flatpakrefs / 'local.json'
         self.ignore_apps = {}
         self.groups = set()
-        self.new_ignore_apps = {app_id: True for app_id in (args.ignore or [])}
-        self.unignore_apps = {app_id: False for app_id in (args.unignore or [])}
+        self._raw_ignore = list(args.ignore or [])
+        self._raw_unignore = list(args.unignore or [])
+        self.new_ignore_apps = {}
+        self.unignore_apps = {}
         if self.path.exists():
             with self.path.open() as f:
                 local_config = json.load(f)
             self.ignore_apps = local_config.get('ignore_apps', {})
             self.groups = set(local_config.get('groups', []))
+        self._orig_groups = self.groups.copy()
+        self._ignore_apps = dict(self.ignore_apps)
+
+    def resolve_apps(self, known_apps):
+        self.new_ignore_apps = {resolve_app_id(q, known_apps): True for q in self._raw_ignore}
+        self.unignore_apps = {resolve_app_id(q, known_apps): False for q in self._raw_unignore}
         self._ignore_apps = self.ignore_apps | self.new_ignore_apps | self.unignore_apps
 
     def ignore(self, app_id, value=True):
@@ -231,47 +239,114 @@ class LocalConfig:
         return False
 
     def write(self):
-        if self.new_ignore_apps or self.unignore_apps:
+        if self.new_ignore_apps or self.unignore_apps or self.groups != self._orig_groups:
             with self.path.open('w') as f:
                 json.dump(dict(
                     ignore_apps={k: v for k, v in self._ignore_apps.items() if v},
+                    groups=sorted(self.groups),
                 ), f, indent=2)
 
 
-def parse_group_args(arg_list):
+def resolve_app_id(query, known_apps):
+    """Resolve a partial, case-insensitive query to a full app_id.
+
+    Matches against app_id and name. Exact app_id match (case-insensitive) is
+    preferred, then partial matches. Raises if ambiguous or no match.
+    """
+    query_lower = query.lower()
+    # Exact app_id match (case-insensitive)
+    for app in known_apps:
+        if app.app_id.lower() == query_lower:
+            return app.app_id
+    # Partial matches against app_id and name
+    matches = []
+    for app in known_apps:
+        if query_lower in app.app_id.lower() or query_lower in app.name.lower():
+            if app.app_id not in [m.app_id for m in matches]:
+                matches.append(app)
+    if len(matches) == 1:
+        return matches[0].app_id
+    if not matches:
+        raise SystemExit(f'No app matching "{query}"')
+    names = ', '.join(str(app) for app in matches)
+    raise SystemExit(f'Ambiguous app "{query}", matches: {names}')
+
+
+def parse_group_args(arg_list, known_apps=None):
     result = {}
     for entry in (arg_list or []):
-        app_id, _, groups = entry.partition(':')
+        if ':' in entry:
+            app_id, _, groups = entry.partition(':')
+            if known_apps is not None:
+                app_id = resolve_app_id(app_id, known_apps)
+        else:
+            app_id = None
+            groups = entry
         result.setdefault(app_id, set()).update(g.strip() for g in groups.split(',') if g.strip())
     return result
 
 
+def apply_group_changes(app_id, groups, add_groups, rm_groups):
+    if app_id in add_groups or app_id in rm_groups:
+        groups |= add_groups.get(app_id, set())
+        groups -= rm_groups.get(app_id, set())
+        return True
+    return False
+
+
 def main(args, synced_flatpakrefs, local_config):
-    if local_config.groups:
-        print(f'Active groups: {", ".join(sorted(local_config.groups))}')
-    else:
-        print('No active groups')
-    add_groups = parse_group_args(args.add_groups)
-    rm_groups = parse_group_args(args.rm_groups)
-    install = {}
-    groups_changed = []
     user_installation = Flatpak.Installation.new_user()
+
+    # Load all known apps for resolving partial matches
+    synced_apps = []
     for ref_path in synced_flatpakrefs.iterdir():
         if ref_path.suffix == '.flatpakref':
-            app = App(synced_flatpakrefs, user_installation, path=ref_path)
-            if app.app_id in add_groups or app.app_id in rm_groups:
-                app.groups |= add_groups.get(app.app_id, set())
-                app.groups -= rm_groups.get(app.app_id, set())
-                app.write()
-            if local_config.should_ignore(app):
-                if args.list:
-                    print(f'Skipping {app}')
-                continue
-            install[app.app_id] = app
+            synced_apps.append(App(synced_flatpakrefs, user_installation, path=ref_path))
+    installed_apps = get_all_installed_apps(synced_flatpakrefs, user_installation)
+    known_apps = list(synced_apps)
+    for app in installed_apps:
+        if app.app_id not in {a.app_id for a in known_apps}:
+            known_apps.append(app)
+
+    local_config.resolve_apps(known_apps)
+    add_groups = parse_group_args(args.add_groups, known_apps)
+    rm_groups = parse_group_args(args.rm_groups, known_apps)
+    apply_group_changes(None, local_config.groups, add_groups, rm_groups)
+    install = {}
+    groups_changed = []
+    all_groups = {}
+
+    def ask_activate_groups(groups):
+        for group in groups - local_config.groups:
+            if user_select(f'Activate group "{group}" locally?',
+                    [('Y', 'yes'), ('n', 'no')], default='Y') == 'Y':
+                local_config.groups.add(group)
+
+    for app in synced_apps:
+        if apply_group_changes(app.app_id, app.groups, add_groups, rm_groups):
+            ask_activate_groups(add_groups.get(app.app_id, set()))
+            app.write()
+        for group in app.groups:
+            all_groups[group] = all_groups.get(group, 0) + 1
+        if local_config.should_ignore(app):
+            if args.list:
+                print(f'Skipping {app}')
+            continue
+        install[app.app_id] = app
+    for group in local_config.groups:
+        all_groups.setdefault(group, 0)
+    if all_groups:
+        print('Groups:')
+        for group in sorted(all_groups):
+            count = all_groups[group]
+            active = ' (active)' if group in local_config.groups else ''
+            print(f'  {group} ({count} apps){active}')
+    else:
+        print('No groups')
 
     decide = []
     rm_synced_apps = []
-    apps = get_all_installed_apps(synced_flatpakrefs, user_installation)
+    apps = installed_apps
     if apps:
         print('Installed:')
     for app in apps:
@@ -305,6 +380,7 @@ def main(args, synced_flatpakrefs, local_config):
         group = input('    Group name: ').strip()
         if group:
             app.groups.add(group)
+            ask_activate_groups({group})
             if app not in groups_changed:
                 groups_changed.append(app)
 
@@ -371,18 +447,23 @@ def main(args, synced_flatpakrefs, local_config):
         print(f'  Removing {app}')
         app.path.unlink()
 
-    local_config.write()
-
 
 if __name__ == '__main__':
-    arg_parser = ArgumentParser()
-    arg_parser.add_argument('--list', '-l', action='store_true')
-    arg_parser.add_argument('--ignore', '-i', action='append')
-    arg_parser.add_argument('--unignore', action='append')
-    arg_parser.add_argument('--add-groups', action='append', metavar='APP_ID:GROUP,GROUP,...')
-    arg_parser.add_argument('--rm-groups', action='append', metavar='APP_ID:GROUP,GROUP,...')
+    arg_parser = ArgumentParser(
+        description='Sync Flatpak applications across machines using flatpakref files.')
+    arg_parser.add_argument('--list', '-l', action='store_true',
+        help='list synced and installed apps without making changes')
+    arg_parser.add_argument('--ignore', '-i', action='append', metavar='APP',
+        help='ignore an app so it is not installed or synced (partial name match)')
+    arg_parser.add_argument('--unignore', action='append', metavar='APP',
+        help='stop ignoring a previously ignored app (partial name match)')
+    arg_parser.add_argument('--add-groups', action='append', metavar='[APP:]GROUP,GROUP,...',
+        help='add groups globally or to a specific app (partial name match)')
+    arg_parser.add_argument('--rm-groups', action='append', metavar='[APP:]GROUP,GROUP,...',
+        help='remove groups globally or from a specific app (partial name match)')
     args = arg_parser.parse_args()
 
     synced_flatpakrefs = config_dir / 'sync-flatpak'
     local_config = LocalConfig(synced_flatpakrefs, args)
     main(args, synced_flatpakrefs, local_config)
+    local_config.write()
