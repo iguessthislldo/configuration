@@ -1,6 +1,6 @@
 /scraps
 /export-list
-/export.txz
+/export*.txz
 /isoenv
 /tree.dot
 /install_saved_vars.sh

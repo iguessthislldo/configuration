@@ -2,6 +2,7 @@
 
 import sys
 import json
+import tarfile
 import subprocess
 from pathlib import Path
 from argparse import ArgumentParser
@@ -294,10 +295,143 @@ def apply_group_changes(app_id, groups, add_groups, rm_groups):
     return False
 
 
-def main(args, synced_flatpakrefs, local_config):
-    user_installation = Flatpak.Installation.new_user()
+FLATPAK_APP_DATA = Path.home() / '.var/app'
 
-    # Load all known apps for resolving partial matches
+
+def _user_overrides_dir():
+    return Path(Flatpak.Installation.new_user().get_path().get_path()) / 'overrides'
+
+
+DATA_KINDS = {
+    'config': lambda app_id: FLATPAK_APP_DATA / app_id / 'config',
+    'data': lambda app_id: FLATPAK_APP_DATA / app_id / 'data',
+    'cache': lambda app_id: FLATPAK_APP_DATA / app_id / 'cache',
+    'state': lambda app_id: FLATPAK_APP_DATA / app_id / '.local/state',
+    'perms': lambda app_id: _user_overrides_dir() / app_id,
+}
+DEFAULT_KINDS = {'config', 'data', 'state', 'perms'}
+ALL_KINDS = set(DATA_KINDS)
+EXPORT_ARCHIVE = Path('export-flatpak-data.txz')
+
+
+def parse_export_args(app_specs, known_apps):
+    result = []
+    for spec in app_specs:
+        if ':' in spec:
+            query, _, kinds_str = spec.partition(':')
+            kinds = {k.strip() for k in kinds_str.split(',') if k.strip()}
+            if 'all' in kinds:
+                kinds = ALL_KINDS
+            invalid = kinds - ALL_KINDS
+            if invalid:
+                raise SystemExit(f'Invalid kinds: {", ".join(sorted(invalid))}. '
+                    f'Valid: {", ".join(sorted(ALL_KINDS))}, all')
+        else:
+            query = spec
+            kinds = DEFAULT_KINDS
+        app_id = resolve_app_id(query, known_apps)
+        result.append((app_id, kinds))
+    return result
+
+
+def export_data(args, synced_flatpakrefs):
+    _, _, known_apps, _ = load_known_apps(synced_flatpakrefs)
+    app_specs = parse_export_args(args.apps, known_apps)
+
+    if EXPORT_ARCHIVE.exists():
+        raise SystemExit(f'{EXPORT_ARCHIVE} already exists')
+
+    with tarfile.open(EXPORT_ARCHIVE, 'w:xz') as tar:
+        for app_id, kinds in app_specs:
+            for kind in sorted(kinds):
+                src = DATA_KINDS[kind](app_id)
+                if not src.exists():
+                    print(f'  Skipping {app_id}/{kind} (not found: {src})')
+                    continue
+                print(f'  Adding {app_id}/{kind}')
+                tar.add(src, arcname=f'{app_id}/{kind}')
+    print(f'Created {EXPORT_ARCHIVE}')
+
+
+import os
+import shutil
+
+
+def import_data(args, synced_flatpakrefs):
+    if not EXPORT_ARCHIVE.exists():
+        raise SystemExit(f'{EXPORT_ARCHIVE} not found')
+
+    _, installed_apps, known_apps, _ = load_known_apps(synced_flatpakrefs)
+    installed_ids = {app.app_id for app in installed_apps}
+
+    with tarfile.open(EXPORT_ARCHIVE, 'r:xz') as tar:
+        # Discover app_ids and their kinds from the archive
+        archive_apps = {}
+        for member in tar.getmembers():
+            parts = Path(member.name).parts
+            if len(parts) >= 2:
+                archive_apps.setdefault(parts[0], set()).add(parts[1])
+
+        if args.apps:
+            selected = set()
+            for query in args.apps:
+                app_id = resolve_app_id(query, known_apps)
+                if app_id not in archive_apps:
+                    raise SystemExit(f'{app_id} not found in archive')
+                selected.add(app_id)
+        else:
+            selected = set(archive_apps)
+
+        for app_id in sorted(selected):
+            if app_id not in installed_ids:
+                raise SystemExit(f'{app_id} is not installed, install it first')
+
+        for app_id in sorted(selected):
+            kinds = archive_apps[app_id]
+            existing = []
+            for kind in sorted(kinds):
+                dest = DATA_KINDS[kind](app_id)
+                if dest.exists():
+                    existing.append(kind)
+            if existing:
+                if user_select(
+                        f'{app_id} has existing data ({", ".join(existing)}), overwrite?',
+                        [('Y', 'yes'), ('n', 'no')], default='n') == 'n':
+                    print(f'  Skipping {app_id}')
+                    continue
+
+            print(f'  Importing {app_id} ({", ".join(sorted(kinds))})')
+            for kind in sorted(kinds):
+                dest = DATA_KINDS[kind](app_id)
+                if dest.exists():
+                    if dest.is_dir():
+                        shutil.rmtree(dest)
+                    else:
+                        dest.unlink()
+
+                prefix = f'{app_id}/{kind}'
+                members = [m for m in tar.getmembers()
+                    if m.name == prefix or m.name.startswith(prefix + '/')]
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                for member in members:
+                    rel = member.name[len(prefix):].lstrip('/')
+                    target = dest / rel if rel else dest
+                    if member.isdir():
+                        target.mkdir(parents=True, exist_ok=True)
+                    elif member.issym():
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        target.symlink_to(member.linkname)
+                    else:
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        with tar.extractfile(member) as src, open(target, 'wb') as dst:
+                            shutil.copyfileobj(src, dst)
+                        os.chmod(target, member.mode)
+
+    print('Import complete')
+
+
+def load_known_apps(synced_flatpakrefs):
+    user_installation = Flatpak.Installation.new_user()
     synced_apps = []
     for ref_path in synced_flatpakrefs.iterdir():
         if ref_path.suffix == '.flatpakref':
@@ -307,6 +441,11 @@ def main(args, synced_flatpakrefs, local_config):
     for app in installed_apps:
         if app.app_id not in {a.app_id for a in known_apps}:
             known_apps.append(app)
+    return synced_apps, installed_apps, known_apps, user_installation
+
+
+def main(args, synced_flatpakrefs, local_config):
+    synced_apps, installed_apps, known_apps, user_installation = load_known_apps(synced_flatpakrefs)
 
     local_config.resolve_apps(known_apps)
     add_groups = parse_group_args(args.add_groups, known_apps)
@@ -451,19 +590,48 @@ def main(args, synced_flatpakrefs, local_config):
 if __name__ == '__main__':
     arg_parser = ArgumentParser(
         description='Sync Flatpak applications across machines using flatpakref files.')
-    arg_parser.add_argument('--list', '-l', action='store_true',
-        help='list synced and installed apps without making changes')
-    arg_parser.add_argument('--ignore', '-i', action='append', metavar='APP',
-        help='ignore an app so it is not installed or synced (partial name match)')
-    arg_parser.add_argument('--unignore', action='append', metavar='APP',
-        help='stop ignoring a previously ignored app (partial name match)')
-    arg_parser.add_argument('--add-groups', action='append', metavar='[APP:]GROUP,GROUP,...',
-        help='add groups globally or to a specific app (partial name match)')
-    arg_parser.add_argument('--rm-groups', action='append', metavar='[APP:]GROUP,GROUP,...',
-        help='remove groups globally or from a specific app (partial name match)')
-    args = arg_parser.parse_args()
+    subparsers = arg_parser.add_subparsers(dest='command')
 
+    sync_parser = subparsers.add_parser('sync', aliases=['s'], help='sync flatpak apps (default)')
+    sync_parser.add_argument('--list', '-l', action='store_true',
+        help='list synced and installed apps without making changes')
+    sync_parser.add_argument('--ignore', '-i', action='append', metavar='APP',
+        help='ignore an app so it is not installed or synced (partial name match)')
+    sync_parser.add_argument('--unignore', action='append', metavar='APP',
+        help='stop ignoring a previously ignored app (partial name match)')
+    sync_parser.add_argument('--add-groups', action='append', metavar='[APP:]GROUP,GROUP,...',
+        help='add groups globally or to a specific app (partial name match)')
+    sync_parser.add_argument('--rm-groups', action='append', metavar='[APP:]GROUP,GROUP,...',
+        help='remove groups globally or from a specific app (partial name match)')
+
+    export_parser = subparsers.add_parser('export', aliases=['e'],
+        help='export app data to an archive')
+    export_parser.add_argument('apps', nargs='+', metavar='APP[:KIND,...]',
+        help='apps to export with optional kinds: config, data, cache, state, perms, all '
+             '(default: config,data,state,perms)')
+
+    import_parser = subparsers.add_parser('import', aliases=['i'],
+        help='import app data from an archive')
+    import_parser.add_argument('apps', nargs='*', metavar='APP',
+        help='apps to import (default: all apps in archive, partial name match)')
+
+    subparsers.add_parser('list', aliases=['l'],
+        help='shortcut for sync --list')
+
+    args = arg_parser.parse_args()
+    if args.command is None:
+        args = sync_parser.parse_args()
+        args.command = 'sync'
+    elif args.command in ('list', 'l'):
+        args = sync_parser.parse_args(['--list'])
+        args.command = 'sync'
     synced_flatpakrefs = config_dir / 'sync-flatpak'
-    local_config = LocalConfig(synced_flatpakrefs, args)
-    main(args, synced_flatpakrefs, local_config)
-    local_config.write()
+
+    if args.command in ('export', 'e'):
+        export_data(args, synced_flatpakrefs)
+    elif args.command in ('import', 'i'):
+        import_data(args, synced_flatpakrefs)
+    else:
+        local_config = LocalConfig(synced_flatpakrefs, args)
+        main(args, synced_flatpakrefs, local_config)
+        local_config.write()
