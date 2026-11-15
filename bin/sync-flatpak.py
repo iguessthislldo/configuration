@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 
+import sys
 import json
+import subprocess
 from pathlib import Path
 from argparse import ArgumentParser
 from configparser import RawConfigParser
 
 import gi
-gi.require_version('Flatpak', '1.0')
+try:
+    gi.require_version('Flatpak', '1.0')
+except ValueError:
+    print('Might need gir1.2-flatpak-1.0', file=sys.stderr)
+    raise
 from gi.repository import Flatpak
 from gi.repository import GLib
 
@@ -36,8 +42,26 @@ def user_select(prompt, options, default=None):
         print('  Invalid choice, try again.')
 
 
+KNOWN_REMOTES = {
+    'https://dl.flathub.org/repo/': ('flathub', 'https://flathub.org/repo/flathub.flatpakrepo'),
+}
+
+
+def ensure_remote(installation, url):
+    for remote in installation.list_remotes():
+        if remote.get_url() == url:
+            return
+    known = KNOWN_REMOTES.get(url)
+    if known is None:
+        raise RuntimeError(f'Unknown remote URL: {url}')
+    subprocess.check_call(['flatpak', 'remote-add', '--user', '--if-not-exists', *known])
+
+
 def setup_transaction(installation):
     transaction = Flatpak.Transaction.new_for_installation(installation)
+    transaction.add_default_dependency_sources()
+    for sys_inst in Flatpak.get_system_installations():
+        transaction.add_dependency_source(sys_inst)
 
     def format_size(size):
         for unit in ('B', 'KB', 'MB', 'GB'):
@@ -155,7 +179,7 @@ class App:
         if self.groups:
             groups = f' [{', '.join(self.groups)}]'
         # If downloaded from flatpak the title is "<app_id> from flathub" for
-        # some reason, so avoid double saying the app id.
+        # some reason, so avoid saying the app id twice.
         if self.app_id in self.name:
             name = self.name
         else:
@@ -225,6 +249,8 @@ def parse_group_args(arg_list):
 def main(args, synced_flatpakrefs, local_config):
     if local_config.groups:
         print(f'Active groups: {", ".join(sorted(local_config.groups))}')
+    else:
+        print('No active groups')
     add_groups = parse_group_args(args.add_groups)
     rm_groups = parse_group_args(args.rm_groups)
     install = {}
@@ -239,14 +265,16 @@ def main(args, synced_flatpakrefs, local_config):
                 app.write()
             if local_config.should_ignore(app):
                 if args.list:
-                    print(f'  Skipping {app}')
+                    print(f'Skipping {app}')
                 continue
             install[app.app_id] = app
 
     decide = []
     rm_synced_apps = []
-    print('Installed:')
-    for app in get_all_installed_apps(synced_flatpakrefs, user_installation):
+    apps = get_all_installed_apps(synced_flatpakrefs, user_installation)
+    if apps:
+        print('Installed:')
+    for app in apps:
         app_id = app.ref.get_name()
         synced = app_id in install
         check_app = install[app_id] if synced else app
@@ -326,6 +354,7 @@ def main(args, synced_flatpakrefs, local_config):
         transaction = setup_transaction(user_installation)
         for app in install.values():
             print(f'  Installing {app}')
+            ensure_remote(user_installation, app.remote_url)
             transaction.add_install_flatpakref(GLib.Bytes.new(app.path.read_bytes()))
         for app in uninstall:
             print(f'  Uninstalling {app}')
