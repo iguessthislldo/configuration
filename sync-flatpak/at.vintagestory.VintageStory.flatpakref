@@ -1,0 +1,9 @@
+[Flatpak Ref]
+Name = at.vintagestory.VintageStory
+Title = Vintage Story
+Branch = stable
+Url = https://dl.flathub.org/repo/
+
+[sync-flatpak.py]
+Groups = games
+

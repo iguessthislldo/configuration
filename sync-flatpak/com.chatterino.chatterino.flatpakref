@@ -1,0 +1,6 @@
+[Flatpak Ref]
+Name = com.chatterino.chatterino
+Title = Chatterino
+Branch = stable
+Url = https://dl.flathub.org/repo/
+

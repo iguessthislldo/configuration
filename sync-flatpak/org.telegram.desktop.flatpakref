@@ -1,0 +1,6 @@
+[Flatpak Ref]
+Name = org.telegram.desktop
+Title = Telegram
+Branch = stable
+Url = https://dl.flathub.org/repo/
+

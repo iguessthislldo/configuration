@@ -1,0 +1,9 @@
+[Flatpak Ref]
+Name = net.davidotek.pupgui2
+Title = ProtonUp-Qt
+Branch = stable
+Url = https://dl.flathub.org/repo/
+
+[sync-flatpak.py]
+Groups = games
+

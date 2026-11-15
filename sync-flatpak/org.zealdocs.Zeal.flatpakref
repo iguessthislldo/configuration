@@ -1,0 +1,6 @@
+[Flatpak Ref]
+Name = org.zealdocs.Zeal
+Title = Zeal
+Branch = stable
+Url = https://dl.flathub.org/repo/
+

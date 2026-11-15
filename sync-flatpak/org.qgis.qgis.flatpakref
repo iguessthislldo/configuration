@@ -1,0 +1,9 @@
+[Flatpak Ref]
+Name = org.qgis.qgis
+Title = QGIS Desktop
+Branch = stable
+Url = https://dl.flathub.org/repo/
+
+[sync-flatpak.py]
+Groups = large
+

@@ -1,0 +1,8 @@
+[Flatpak Ref]
+Name = org.freecad.FreeCAD
+Title = FreeCAD
+Branch = stable
+Url = https://dl.flathub.org/repo/
+
+[sync-flatpak.py]
+Groups=large

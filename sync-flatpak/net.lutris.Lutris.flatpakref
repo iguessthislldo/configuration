@@ -1,0 +1,9 @@
+[Flatpak Ref]
+Name = net.lutris.Lutris
+Title = Lutris
+Branch = stable
+Url = https://dl.flathub.org/repo/
+
+[sync-flatpak.py]
+Groups = games
+
