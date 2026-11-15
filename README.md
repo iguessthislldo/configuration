@@ -25,12 +25,13 @@ These are saved to `install_saved_vars.sh`.
     - Zsh
     - GnuPG
     - git
-    - Ex: `sudo apt install zsh gnupg git`
     - Optionally:
         - xclip
         - ptpython
         - ipython
-        - Ex: `sudo apt install xclip ptpython ipython`
+        - xdg-open
+    - On Ubuntu/Debian:
+        - `sudo apt install zsh gnupg git xclip ptpython ipython3 xdg-utils`
 - Create a `/data` directory (or whatever `$install_data` is)
     - `sudo mkdir /data`
     - `sudo chown $USER:$USER /data`
@@ -41,6 +42,16 @@ These are saved to `install_saved_vars.sh`.
 - `bash install_data.sh` to do the initial setup, clearing existing default
   stuff in the home directory and repeating the command as necessary until
   it's able to finish.
+- Install [Flatpak](https://flathub.org/en/setup)
+    - The system has to be restarted for flatpak to work correctly, can do that
+      after setting the default shell.
+    - `sync-flatpak.py`
+        - To use `sync-flatpak.py`, the libflatpak GI bindings are needed. On
+          Ubuntu/Debian these can be installed using `sudo apt install gir1.2-gtk-4.0`
+        - Use `sync-flatpak.py -l` to see the groups and apps
+        - Use `sync-flatpak.py` to install all the default apps and
+          `sync-flatpak.py --add-groups <group1>,<group2>,...` to include
+          optional groups and install the apps.
 - Set Zsh as the default shell, for example: `chsh -s /usr/bin/zsh`
 - At this point now or later we can either run `zsh` manually or relogin to
   have it take its place as the default shell.
