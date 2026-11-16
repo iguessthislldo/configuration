@@ -32,6 +32,9 @@
       "pikchr": {
         "pkg-path": "pikchr"
       },
+      "quarto": {
+        "pkg-path": "quarto"
+      },
       "ripgrep": {
         "pkg-path": "ripgrep"
       },
@@ -86,7 +89,8 @@
       "scrape_date": "2026-06-17T03:13:13.585548Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "18.16.1",
@@ -116,7 +120,8 @@
       "scrape_date": "2026-06-17T03:44:07.883022Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "18.16.1",
@@ -146,7 +151,8 @@
       "scrape_date": "2026-06-17T04:13:05.839367Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "18.16.1",
@@ -176,7 +182,8 @@
       "scrape_date": "2026-06-17T04:47:03.866405Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "18.16.1",
@@ -207,7 +214,8 @@
       "scrape_date": "2026-06-17T03:13:14.717235Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.73.1",
@@ -240,7 +248,8 @@
       "scrape_date": "2026-06-17T03:44:09.594460Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.73.1",
@@ -273,7 +282,8 @@
       "scrape_date": "2026-06-17T04:13:07.031355Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.73.1",
@@ -306,7 +316,8 @@
       "scrape_date": "2026-06-17T04:47:05.745119Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.73.1",
@@ -339,7 +350,8 @@
       "scrape_date": "2026-06-17T03:13:14.808449Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.94.0",
@@ -370,7 +382,8 @@
       "scrape_date": "2026-06-17T03:44:09.734419Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.94.0",
@@ -401,7 +414,8 @@
       "scrape_date": "2026-06-17T04:13:07.124706Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.94.0",
@@ -432,11 +446,13 @@
       "scrape_date": "2026-06-17T04:47:05.900645Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.94.0",
       "outputs_to_install": [
+        "out",
         "out",
         "out"
       ],
@@ -463,7 +479,8 @@
       "scrape_date": "2026-06-17T03:13:14.850851Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.54.0",
@@ -496,7 +513,8 @@
       "scrape_date": "2026-06-17T03:44:09.791984Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.54.0",
@@ -529,7 +547,8 @@
       "scrape_date": "2026-06-17T04:13:07.165719Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.54.0",
@@ -561,7 +580,8 @@
       "scrape_date": "2026-06-17T04:47:05.961403Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.54.0",
@@ -597,7 +617,8 @@
       "scrape_date": "2026-06-17T03:13:31.265729Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "1.8.1",
@@ -636,7 +657,8 @@
       "scrape_date": "2026-06-17T03:44:31.099705Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "1.8.1",
@@ -674,7 +696,8 @@
       "scrape_date": "2026-06-17T04:13:24.080171Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "1.8.1",
@@ -711,7 +734,8 @@
       "scrape_date": "2026-06-17T04:47:28.480167Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "1.8.1",
@@ -752,7 +776,8 @@
       "scrape_date": "2026-06-17T03:13:37.739403Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.35",
@@ -782,7 +807,8 @@
       "scrape_date": "2026-06-17T03:44:45.869311Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.35",
@@ -812,7 +838,8 @@
       "scrape_date": "2026-06-17T04:13:30.918621Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.35",
@@ -842,7 +869,8 @@
       "scrape_date": "2026-06-17T04:47:45.533638Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.35",
@@ -872,7 +900,8 @@
       "scrape_date": "2026-06-17T03:13:37.743639Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.24.12",
@@ -905,7 +934,8 @@
       "scrape_date": "2026-06-17T03:44:45.874609Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.24.12",
@@ -938,7 +968,8 @@
       "scrape_date": "2026-06-17T04:13:30.922908Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.24.12",
@@ -971,7 +1002,8 @@
       "scrape_date": "2026-06-17T04:47:45.539151Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.24.12",
@@ -1004,7 +1036,8 @@
       "scrape_date": "2026-06-17T03:13:38.322639Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.12.3",
@@ -1034,7 +1067,8 @@
       "scrape_date": "2026-06-17T03:44:46.837596Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.12.3",
@@ -1064,7 +1098,8 @@
       "scrape_date": "2026-06-17T04:13:31.532671Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.12.3",
@@ -1094,7 +1129,8 @@
       "scrape_date": "2026-06-17T04:47:46.558288Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.12.3",
@@ -1124,7 +1160,8 @@
       "scrape_date": "2026-06-17T03:13:53.783806Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2026-04-03",
@@ -1154,7 +1191,8 @@
       "scrape_date": "2026-06-17T03:45:07.632890Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2026-04-03",
@@ -1184,7 +1222,8 @@
       "scrape_date": "2026-06-17T04:13:47.396175Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2026-04-03",
@@ -1214,7 +1253,8 @@
       "scrape_date": "2026-06-17T04:48:07.955074Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2026-04-03",
@@ -1223,6 +1263,130 @@
       ],
       "outputs": {
         "out": "/nix/store/qiqhv85m4n7b2sh826d7v4l700wgx71x-pikchr-0-unstable-2026-04-03"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "quarto",
+      "broken": false,
+      "derivation": "/nix/store/z95i4nlcgjmgzdykhxpgsrb5gbq7g52r-quarto-1.9.37.drv",
+      "description": "Open-source scientific and technical publishing system built on Pandoc",
+      "install_id": "quarto",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
+      "name": "quarto-1.9.37",
+      "pname": "quarto",
+      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
+      "rev_count": 1017464,
+      "rev_date": "2026-06-16T02:33:49Z",
+      "scrape_date": "2026-06-17T03:14:47.115635Z",
+      "stabilities": [
+        "staging",
+        "unstable",
+        "stable"
+      ],
+      "unfree": false,
+      "version": "1.9.37",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/mpm4qqilzdg615nfhyfc7kg39jgrigpa-quarto-1.9.37"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "quarto",
+      "broken": false,
+      "derivation": "/nix/store/rbnjw1544da9g16gkwrrxj1j600iy0kz-quarto-1.9.37.drv",
+      "description": "Open-source scientific and technical publishing system built on Pandoc",
+      "install_id": "quarto",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
+      "name": "quarto-1.9.37",
+      "pname": "quarto",
+      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
+      "rev_count": 1017464,
+      "rev_date": "2026-06-16T02:33:49Z",
+      "scrape_date": "2026-06-17T03:46:10.883293Z",
+      "stabilities": [
+        "staging",
+        "unstable",
+        "stable"
+      ],
+      "unfree": false,
+      "version": "1.9.37",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8ys4w8bp5s8hlzz8wrm627ivn5cg67wv-quarto-1.9.37"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "quarto",
+      "broken": false,
+      "derivation": "/nix/store/x3pxs3xp9rdk2qxyfc9zfsjny8x7q5v4-quarto-1.9.37.drv",
+      "description": "Open-source scientific and technical publishing system built on Pandoc",
+      "install_id": "quarto",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
+      "name": "quarto-1.9.37",
+      "pname": "quarto",
+      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
+      "rev_count": 1017464,
+      "rev_date": "2026-06-16T02:33:49Z",
+      "scrape_date": "2026-06-17T04:14:41.406337Z",
+      "stabilities": [
+        "staging",
+        "unstable",
+        "stable"
+      ],
+      "unfree": false,
+      "version": "1.9.37",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/p7015s5pb0jj9abn5l9rjywmm689krxg-quarto-1.9.37"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "quarto",
+      "broken": false,
+      "derivation": "/nix/store/28hgrc8a3dh8wc5i7yxigynma97rr206-quarto-1.9.37.drv",
+      "description": "Open-source scientific and technical publishing system built on Pandoc",
+      "install_id": "quarto",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
+      "name": "quarto-1.9.37",
+      "pname": "quarto",
+      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
+      "rev_count": 1017464,
+      "rev_date": "2026-06-16T02:33:49Z",
+      "scrape_date": "2026-06-17T04:49:12.827941Z",
+      "stabilities": [
+        "staging",
+        "unstable",
+        "stable"
+      ],
+      "unfree": false,
+      "version": "1.9.37",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q4dgxh9gcwyg9blx8lb5fqdnzihqkhc4-quarto-1.9.37"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -1244,7 +1408,8 @@
       "scrape_date": "2026-06-17T03:14:48.427040Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "15.1.0",
@@ -1276,7 +1441,8 @@
       "scrape_date": "2026-06-17T03:46:12.697732Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "15.1.0",
@@ -1307,7 +1473,8 @@
       "scrape_date": "2026-06-17T04:14:42.721406Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "15.1.0",
@@ -1338,7 +1505,8 @@
       "scrape_date": "2026-06-17T04:49:14.779141Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "15.1.0",
@@ -1369,7 +1537,8 @@
       "scrape_date": "2026-06-17T03:15:38.514299Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "3.4.4",
@@ -1400,7 +1569,8 @@
       "scrape_date": "2026-06-17T03:47:15.380649Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "3.4.4",
@@ -1431,7 +1601,8 @@
       "scrape_date": "2026-06-17T04:15:32.733375Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "3.4.4",
@@ -1462,7 +1633,8 @@
       "scrape_date": "2026-06-17T04:50:18.475999Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "3.4.4",
@@ -1494,7 +1666,8 @@
       "scrape_date": "2026-06-17T03:15:38.905191Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.24.0",
@@ -1524,7 +1697,8 @@
       "scrape_date": "2026-06-17T03:47:15.921698Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.24.0",
@@ -1554,7 +1728,8 @@
       "scrape_date": "2026-06-17T04:15:33.113072Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.24.0",
@@ -1584,7 +1759,8 @@
       "scrape_date": "2026-06-17T04:50:18.945144Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.24.0",
@@ -1614,7 +1790,8 @@
       "scrape_date": "2026-06-17T03:15:39.418746Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.3.2",
@@ -1650,7 +1827,8 @@
       "scrape_date": "2026-06-17T03:47:16.818575Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.3.2",
@@ -1684,7 +1862,8 @@
       "scrape_date": "2026-06-17T04:15:33.604246Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.3.2",
@@ -1718,7 +1897,8 @@
       "scrape_date": "2026-06-17T04:50:19.799361Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "2.3.2",
@@ -1752,7 +1932,8 @@
       "scrape_date": "2026-06-17T03:16:02.075201Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.11.19",
@@ -1782,7 +1963,8 @@
       "scrape_date": "2026-06-17T03:47:42.802917Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.11.19",
@@ -1812,7 +1994,8 @@
       "scrape_date": "2026-06-17T04:15:56.262354Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.11.19",
@@ -1842,7 +2025,8 @@
       "scrape_date": "2026-06-17T04:50:46.018941Z",
       "stabilities": [
         "staging",
-        "unstable"
+        "unstable",
+        "stable"
       ],
       "unfree": false,
       "version": "0.11.19",
