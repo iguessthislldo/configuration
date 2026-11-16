@@ -1,0 +1,6 @@
+[Flatpak Ref]
+Name = com.github.tchx84.Flatseal
+Title = Flatseal
+Branch = stable
+Url = https://dl.flathub.org/repo/
+

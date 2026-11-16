@@ -1,0 +1,6 @@
+[Flatpak Ref]
+Name = com.betterstickies.BetterStickies
+Title = Better Stickies
+Branch = stable
+Url = https://dl.flathub.org/repo/
+
