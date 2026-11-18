@@ -3,7 +3,7 @@
 # Run in a temp shell using:
 #   $(/usr/bin/ps -cp "$$" -o command="") $CONFIG/sh/recursive-source-for-new-shell.sh SOURCE_PATH
 # Where SOURCE_PATH is the path of the file relative to the directory being
-# checked. This is used for setenv and activate aliases.
+# checked.
 
 igtd_recursive_source="$1"
 

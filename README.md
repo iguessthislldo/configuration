@@ -32,7 +32,7 @@ These are saved to `install_saved_vars.sh`.
         - xdg-open
     - On Ubuntu/Debian:
         - `sudo apt install zsh gnupg git xclip ptpython ipython3 xdg-utils`
-- Create a `/data` directory (or whatever `$install_data` is)
+- Create (or mount) `/data` (or whatever `$install_data` is)
     - `sudo mkdir /data`
     - `sudo chown $USER:$USER /data`
 - Place/clone this repository at `/data/configuration`.
@@ -47,16 +47,7 @@ These are saved to `install_saved_vars.sh`.
     - Set Zsh as the default shell, for example: `chsh -s /usr/bin/zsh`
     - Install [Flatpak](https://flathub.org/en/setup)
     - Run `misc-setup/setup-latptop.sh` if applicable
-- Run `sync-flatpak` if Flatpak was installed:
-    - To use `sync-flatpak`, the libflatpak GI bindings are needed. On
-      Ubuntu/Debian these can be installed using `sudo apt install gir1.2-flatpak-1.0`
-    - Use `sync-flatpak list` to see the groups and apps
-    - Use `sync-flatpak sync` to install all the default apps and
-      `sync-flatpak sync --add-groups <group1>,<group2>,...` to include
-      optional groups and install the apps
-    - Use `sync-flatpak export <app>...` export apps from an existing
-      system, copy `export-flatpak-data.txz` to the new system, and
-      run `sync-flatpak import` to import on the new system.
+    - Restart the system
 - If copying from an existing `/data` on a source system:
     - To copy files using SSH:
         - Make sure an SSH server is installed and running on the source
@@ -69,6 +60,16 @@ These are saved to `install_saved_vars.sh`.
         - Run `bash install_data.sh import` on destination system.
     - `bash install_data.sh` one final time to have it take up the imported
       files.
+- Run `sync-flatpak` if Flatpak was installed:
+    - To use `sync-flatpak`, the libflatpak GI bindings are needed. On
+      Ubuntu/Debian these can be installed using `sudo apt install gir1.2-flatpak-1.0`
+    - Use `sync-flatpak list` to see the groups and apps
+    - Use `sync-flatpak sync` to install all the default apps and
+      `sync-flatpak sync --add-groups <group1>,<group2>,...` to include
+      optional groups and install the apps
+    - Use `sync-flatpak export <app>...` export apps from an existing
+      system, copy `export-flatpak-data.txz` to the new system, and
+      run `sync-flatpak import` to import on the new system.
 - Set terminal font if desired.
 - Run `(cd ~/cfg/git && bash setup.sh)` to setup Git.
 
@@ -199,27 +200,36 @@ Usage: `makej [ARGS...]`
 
 Run `make` with `ARGS`, but also pass `-j` and the number of CPU cores plus 1.
 
-#### `setenv`
-
-Command checks the current directory and all of its parents for `setenv.sh`,
-and starts an instance of the current shell with that `setenv.sh` sourced.
-
 #### `activate`
 
 Command checks the current directory and all of its parents for a Python
 virtualenv, and starts an instance of the current shell with that virtualenv
 activated.
 
-#### `args`
+#### `add-to-bin`
 
-Usage: `args [ARGS...]`
+Usage: `add-to-bin REAL_FILE [NAME]`
 
-Simple python script that lists the arguments it was passed. Use to see how the
-shell is passing arguments to a program.
+Creates a symlink in `~/bin` pointing to `REAL_FILE`. If `NAME` is given, the
+symlink will use that name instead of the file's basename.
 
-#### `h`
+#### `sync-flatpak`
 
-Usage: `h DAYS`
+Usage: `sync-flatpak <command> [OPTIONS]`
 
-Print the shell history for the given number of days ago, which can be 0 for
-today.
+Sync Flatpak applications across machines using flatpakref files. Requires the
+libflatpak GI bindings (e.g. `gir1.2-flatpak-1.0` on Ubuntu/Debian).
+
+Commands:
+- `list` - List synced and installed apps without making changes.
+- `sync` (default) - Install missing synced apps, decide what to do with
+  unsynced installed apps, and uninstall removed apps.
+  - `--ignore APP`, `-i APP` - Ignore an app so it is not installed or synced.
+  - `--unignore APP` - Stop ignoring a previously ignored app.
+  - `--add-groups [APP:]GROUP,...` - Add groups globally or to a specific app.
+  - `--rm-groups [APP:]GROUP,...` - Remove groups globally or from a specific
+    app.
+- `export APP[:KIND,...]...` - Export app data to `export-flatpak-data.txz`.
+  Kinds: `config`, `data`, `cache`, `state`, `perms`, `all` (default:
+  `config,data,state,perms`).
+- `import [APP...]` - Import app data from `export-flatpak-data.txz`.
