@@ -1,0 +1,10 @@
+[Unit]
+Description=Disable Wakeup on Input Devices
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/disable-wake.sh
+
+[Install]
+WantedBy=multi-user.target
