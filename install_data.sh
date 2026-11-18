@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -e
-shopt -s extdebug
 
 if [ -t 2 ]
 then
@@ -82,7 +81,7 @@ function set_var {
             then
                 fatal_error "$name can't be empty or unset"
             fi
-            value=`realpath -s $value`
+            value=`realpath --canonicalize-missing $value`
             ;;
         bool)
             if [[ ! $value =~ ^(true|false)$ ]]
