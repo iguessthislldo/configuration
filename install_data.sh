@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+shopt -s extdebug
 
 if [ -t 2 ]
 then
