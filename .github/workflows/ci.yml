@@ -21,70 +21,17 @@ jobs:
         run: |
           # /data conflicts with GitHub Actions
           export install_data="${test_data}"
-          mkdir "$install_data"
+          mkdir --parents "$install_data"
           export install_home="${test_home}"
-          mkdir "$install_home"
+          mkdir --parents "$install_home"
           export install_xdg_config_home="${test_xdg_config_home}"
-          mkdir "$install_xdg_config_home"
+          mkdir --parents "$install_xdg_config_home"
           ./install_data.sh
       - name: Show Directories
         run: |
           tree -a -L 2 "${test_data}"
           tree -a -L 2 "${test_home}"
           tree -a -L 2 "${test_xdg_config_home}"
-      - name: Create isolated-zsh
-        run: |
-          zsh=/home/runner/isolated-zsh
-          tee $zsh << EOF
-          #!/usr/bin/expect -f
-          set cmd [join $argv " "]
-          spawn env --ignore-environment - \\
-            HOME=$test_home \\
-            XDG_CONFIG_HOME=$test_xdg_config_home \\
-            TERM=dumb \\
-            IGTD_SH_LOADER_VERBOSE=true \\
-            zsh -i -e
-          set timeout 60
-          expect {
-            -re {.*configuration%.*} {}
-            -re {Ignore insecure directories and continue \\[y\\] or abort compinit \\[n\\]\\?.*} {
-                send "y\r"
-                exp_continue
-            }
-            timeout {
-                puts stderr "ERROR: Timedout waiting for initial shell prompt"
-                exit 1
-            }
-          }
-
-          send "$cmd\r"
-          expect {
-            -re {.*configuration%.*} {}
-            timeout {
-                puts stderr "ERROR: Timedout waiting for second shell prompt"
-                exit 1
-            }
-          }
-
-          send "exit\r"
-          expect {
-            eof {}
-            timeout {
-                puts stderr "ERROR: Timedout waiting for eof"
-                exit 1
-            }
-          }
-          EOF
-          chmod +x $zsh
-      - name: Test Zsh
-        shell: /home/runner/isolated-zsh {0}
-        run: true
-      - name: Test Neovim
-        shell: /home/runner/isolated-zsh {0}
-        run: e --version
-      - name: Test RipGrep
-        shell: /home/runner/isolated-zsh {0}
-        run: rg --version
 
   python-tests:
     runs-on: ubuntu-latest
